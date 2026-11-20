@@ -1,5 +1,5 @@
 export const screenClass =
-  "relative mx-auto flex h-svh min-h-svh w-full max-w-[430px] flex-col overflow-hidden rounded-[26px] border-2 border-[#f3bd83] bg-[#fff8f1] pb-[60px] shadow-[0_0_40px_rgba(62,40,25,0.08)] min-[700px]:mx-0 min-[700px]:h-auto min-[700px]:min-h-screen min-[700px]:max-w-none min-[700px]:rounded-none min-[700px]:border-0 min-[700px]:bg-[#fffdfa] min-[700px]:pb-10 min-[700px]:shadow-none";
+  "relative flex h-svh min-h-svh w-full flex-col overflow-hidden bg-[#fff8f1] pb-[60px] min-[700px]:h-auto min-[700px]:min-h-screen min-[700px]:bg-[#fffdfa] min-[700px]:pb-10";
 
 export const pageContentClass =
   "min-h-0 flex-1 overflow-y-auto overscroll-contain";
@@ -26,7 +26,7 @@ export const screenTitleClass =
   "m-0 text-center text-[13px] font-bold min-[700px]:mr-auto min-[700px]:ml-2 min-[700px]:text-left min-[700px]:text-xl";
 
 export const bottomNavClass =
-  "absolute bottom-0 left-0 z-20 grid h-[54px] w-full grid-cols-4 items-center border-t border-[#eee6df] bg-[#fffaf6] min-[700px]:hidden";
+  "fixed bottom-0 left-0 z-20 grid h-[54px] w-full grid-cols-4 items-center border-t border-[#eee6df] bg-[#fffaf6] min-[700px]:hidden";
 
 export const bottomNavButtonClass =
   "flex h-[50px] flex-col items-center justify-center gap-[2px] border-0 bg-transparent text-[8px] text-[#8d837c]";

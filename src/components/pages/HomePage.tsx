@@ -11,8 +11,8 @@ interface HomePageProps {
 
 export function HomePage({ screen, onNavigate, onSelectRice }: HomePageProps) {
   return (
-    <div     className="relative mx-auto flex h-svh min-h-svh w-full max-w-[430px] flex-col overflow-x-hidden overflow-y-auto rounded-[30px] border-2 border-[#f3bd83] bg-[#fff6ec] pb-[60px] min-[700px]:block min-[700px]:h-auto min-[700px]:min-h-screen min-[700px]:max-w-none min-[700px]:overflow-visible min-[700px]:rounded-none min-[700px]:border-0 min-[700px]:bg-[#fffdfa] min-[700px]:pb-0">
-      <header className="fixed top-0 left-0 z-30 hidden h-[76px] w-full items-center justify-between bg-[#342820] px-[max(5vw,32px)] text-white min-[700px]:flex">
+    <div     className="relative flex h-svh min-h-svh w-full flex-col overflow-x-hidden overflow-y-auto bg-[#fff6ec] min-[700px]:block min-[700px]:h-auto min-[700px]:min-h-screen min-[700px]:overflow-visible min-[700px]:bg-[#fffdfa]">
+      <header className="fixed top-0 left-0 z-30 hidden h-[86px] w-full items-center justify-between bg-[#342820] px-[max(5vw,32px)] text-white min-[700px]:flex">
         <div className="flex items-center gap-[7px]">
           <div className="text-[25px] text-[#e6a64f]">♛</div>
           <div>
@@ -53,11 +53,7 @@ export function HomePage({ screen, onNavigate, onSelectRice }: HomePageProps) {
         </nav>
       </header>
 
-      <section className="relative mt-0 h-[clamp(360px,49svh,414px)] flex-none overflow-visible bg-[linear-gradient(180deg,rgba(10,7,5,0.72),rgba(11,8,5,0.14)_60%,rgba(12,8,5,0.2)),linear-gradient(90deg,rgba(9,6,4,0.88)_0%,rgba(10,7,4,0.6)_48%,rgba(10,7,4,0.04)_100%),url('https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=90')] bg-cover bg-[position:58%_center] after:absolute after:-bottom-[30px] after:-left-[9%] after:-right-[9%] after:z-0 after:h-[65px] after:rounded-[50%_50%_0_0/78%_78%_0_0] after:bg-[#fff6ec] after:content-[''] after:rotate-[2.3deg] min-[700px]:mx-auto min-[700px]:mt-[104px] min-[700px]:h-[clamp(370px,36vw,470px)] min-[700px]:w-[min(1220px,calc(100%-64px))] min-[700px]:overflow-hidden min-[700px]:rounded-[24px] min-[700px]:bg-[linear-gradient(90deg,rgba(37,20,12,0.76)_0%,rgba(37,20,12,0.48)_45%,rgba(37,20,12,0.08)_100%),url('https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=90')] min-[700px]:bg-cover min-[700px]:bg-[position:center_55%]">
-        <div className="absolute inset-x-0 top-0 z-10 flex h-9 items-center justify-between px-[18px] text-[9px] font-bold text-white min-[700px]:hidden">
-          <strong>9:41</strong>
-          <span className="tracking-[1px]">▮▮▮ ▴ ▰</span>
-        </div>
+      <section className="relative mt-0 h-[clamp(360px,49svh,414px)] flex-none overflow-visible bg-[linear-gradient(180deg,rgba(10,7,5,0.72),rgba(11,8,5,0.14)_60%,rgba(12,8,5,0.2)),linear-gradient(90deg,rgba(9,6,4,0.88)_0%,rgba(10,7,4,0.6)_48%,rgba(10,7,4,0.04)_100%),url('https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=90')] bg-cover bg-[position:58%_center] after:absolute after:-bottom-[30px] after:-left-[9%] after:-right-[7%] after:z-0 after:h-[65px] after:rounded-[50%_50%_0_0/78%_78%_0_0] after:bg-[#fff6ec] after:content-[''] after:rotate-[2.3deg] min-[700px]:mx-auto min-[700px]:mt-[104px] min-[700px]:h-[clamp(370px,36vw,470px)] min-[700px]:w-[min(1220px,calc(100%-64px))] min-[700px]:overflow-hidden min-[700px]:rounded-[24px] min-[700px]:bg-[linear-gradient(90deg,rgba(37,20,12,0.76)_0%,rgba(37,20,12,0.48)_45%,rgba(37,20,12,0.08)_100%),url('https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=90')] min-[700px]:bg-cover min-[700px]:bg-[position:center_55%]">
         <header className="absolute inset-x-0 top-9 z-10 flex h-[66px] items-center justify-between bg-transparent px-[21px] text-white min-[700px]:hidden">
           <div className="flex items-center gap-[7px]">
             <div className="text-[30px] leading-none text-[#ff9700]">♛</div>

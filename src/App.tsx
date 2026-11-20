@@ -63,7 +63,7 @@ function App() {
 
   return (
     <main
-      className="min-h-screen bg-[linear-gradient(145deg,#f3a55d,#f9c184_58%,#e9843e)] font-sans text-[#2a201b] min-[700px]:bg-[#fffdfa]"
+      className="min-h-screen bg-[#fff6ec] font-sans text-[#2a201b] min-[700px]:bg-[#fffdfa]"
     >
       {screen === "home" && (
         <HomePage

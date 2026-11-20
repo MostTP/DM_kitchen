@@ -1,4 +1,4 @@
-import { foodImages } from "../../data/menu";
+import { menuItems } from "../../data/menu";
 import type { RiceType, Screen } from "../../types";
 import { BottomNav } from "../BottomNav";
 import { Icon } from "../Icon";
@@ -11,7 +11,7 @@ interface HomePageProps {
 
 export function HomePage({ screen, onNavigate, onSelectRice }: HomePageProps) {
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col overflow-hidden rounded-[30px] border-2 border-[#f3bd83] bg-[#fff6ec] min-[700px]:block min-[700px]:max-w-none min-[700px]:rounded-none min-[700px]:border-0 min-[700px]:bg-[#fffdfa]">
+    <div     className="relative mx-auto flex h-svh min-h-svh w-full max-w-[430px] flex-col overflow-x-hidden overflow-y-auto rounded-[30px] border-2 border-[#f3bd83] bg-[#fff6ec] pb-[60px] min-[700px]:block min-[700px]:h-auto min-[700px]:min-h-screen min-[700px]:max-w-none min-[700px]:overflow-visible min-[700px]:rounded-none min-[700px]:border-0 min-[700px]:bg-[#fffdfa] min-[700px]:pb-0">
       <header className="fixed top-0 left-0 z-30 hidden h-[76px] w-full items-center justify-between bg-[#342820] px-[max(5vw,32px)] text-white min-[700px]:flex">
         <div className="flex items-center gap-[7px]">
           <div className="text-[25px] text-[#e6a64f]">♛</div>
@@ -53,7 +53,7 @@ export function HomePage({ screen, onNavigate, onSelectRice }: HomePageProps) {
         </nav>
       </header>
 
-      <section className="relative mt-0 h-[414px] flex-none overflow-visible bg-[linear-gradient(180deg,rgba(10,7,5,0.72),rgba(11,8,5,0.14)_60%,rgba(12,8,5,0.2)),linear-gradient(90deg,rgba(9,6,4,0.88)_0%,rgba(10,7,4,0.6)_48%,rgba(10,7,4,0.04)_100%),url('https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=90')] bg-cover bg-[position:58%_center] after:absolute after:-bottom-[30px] after:-left-[9%] after:-right-[9%] after:z-0 after:h-[65px] after:rounded-[50%_50%_0_0/78%_78%_0_0] after:bg-[#fff6ec] after:content-[''] after:rotate-[2.3deg] max-[380px]:h-[395px] min-[700px]:mx-auto min-[700px]:mt-[104px] min-[700px]:h-[clamp(370px,36vw,470px)] min-[700px]:w-[min(1220px,calc(100%-64px))] min-[700px]:overflow-hidden min-[700px]:rounded-[24px] min-[700px]:bg-[linear-gradient(90deg,rgba(37,20,12,0.76)_0%,rgba(37,20,12,0.48)_45%,rgba(37,20,12,0.08)_100%),url('https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=90')] min-[700px]:bg-cover min-[700px]:bg-[position:center_55%] ">
+      <section className="relative mt-0 h-[clamp(360px,49svh,414px)] flex-none overflow-visible bg-[linear-gradient(180deg,rgba(10,7,5,0.72),rgba(11,8,5,0.14)_60%,rgba(12,8,5,0.2)),linear-gradient(90deg,rgba(9,6,4,0.88)_0%,rgba(10,7,4,0.6)_48%,rgba(10,7,4,0.04)_100%),url('https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=90')] bg-cover bg-[position:58%_center] after:absolute after:-bottom-[30px] after:-left-[9%] after:-right-[9%] after:z-0 after:h-[65px] after:rounded-[50%_50%_0_0/78%_78%_0_0] after:bg-[#fff6ec] after:content-[''] after:rotate-[2.3deg] min-[700px]:mx-auto min-[700px]:mt-[104px] min-[700px]:h-[clamp(370px,36vw,470px)] min-[700px]:w-[min(1220px,calc(100%-64px))] min-[700px]:overflow-hidden min-[700px]:rounded-[24px] min-[700px]:bg-[linear-gradient(90deg,rgba(37,20,12,0.76)_0%,rgba(37,20,12,0.48)_45%,rgba(37,20,12,0.08)_100%),url('https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=90')] min-[700px]:bg-cover min-[700px]:bg-[position:center_55%]">
         <div className="absolute inset-x-0 top-0 z-10 flex h-9 items-center justify-between px-[18px] text-[9px] font-bold text-white min-[700px]:hidden">
           <strong>9:41</strong>
           <span className="tracking-[1px]">▮▮▮ ▴ ▰</span>
@@ -75,11 +75,11 @@ export function HomePage({ screen, onNavigate, onSelectRice }: HomePageProps) {
             <Icon name="menu" />
           </button>
         </header>
-        <div className="absolute left-0 top-[120px] z-10 h-auto w-full px-[25px] py-2.5 text-white max-[380px]:top-[116px] max-[380px]:px-[21px] min-[700px]:top-0 min-[700px]:h-full min-[700px]:w-[60%] min-[700px]:px-[5.2%] min-[700px]:pt-[clamp(54px,6vw,82px)]">
-          <p className="mb-[9px] whitespace-nowrap text-[clamp(18px,5.2vw,22px)] font-bold italic text-[#ff9200] max-[380px]:text-[clamp(16px,5vw,19px)] min-[700px]:mb-[18px] min-[700px]:text-[clamp(19px,1.8vw,25px)]">
+        <div className="absolute left-0 top-[clamp(105px,14svh,120px)] z-10 h-auto w-full px-[clamp(16px,6.4vw,25px)] py-2.5 text-white min-[700px]:top-0 min-[700px]:h-full min-[700px]:w-[60%] min-[700px]:px-[5.2%] min-[700px]:pt-[clamp(54px,6vw,82px)]">
+          <p className="mb-[9px] text-[clamp(15px,5.2vw,22px)] font-bold italic text-[#ff9200] min-[700px]:mb-[18px] min-[700px]:text-[clamp(19px,1.8vw,25px)]">
             Delicious. Fresh. Satisfying.
           </p>
-          <h1 className="m-0 text-[clamp(37px,10.8vw,43px)] font-[850] leading-[1.04] tracking-[-1.6px] max-[380px]:text-[34px] min-[700px]:font-serif min-[700px]:text-[clamp(58px,5.4vw,76px)] min-[700px]:leading-[0.98]">
+          <h1 className="m-0 text-[clamp(32px,10.8vw,43px)] font-[850] leading-[1.04] tracking-[-1.6px] min-[700px]:font-serif min-[700px]:text-[clamp(58px,5.4vw,76px)] min-[700px]:leading-[0.98]">
             De_Mayor
             <br />
             <b className="text-[#ff7b00] min-[700px]:text-[#d66b34]">Kitchen</b>
@@ -119,58 +119,34 @@ export function HomePage({ screen, onNavigate, onSelectRice }: HomePageProps) {
           </button>
         </div>
         <div className="grid grid-cols-2 gap-[9px] min-[700px]:gap-5">
-          <article className="relative min-w-0 overflow-hidden rounded-[15px] border border-[#f2e4d8] bg-gradient-to-b from-[#fffdfa] to-[#fffaf5] px-1.5 pb-[9px] pt-[5px] shadow-[0_2px_7px_rgba(65,36,18,0.1)] transition hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(66,39,22,0.12)] min-[700px]:rounded-2xl min-[700px]:border-[#eee6de] min-[700px]:p-3">
-            <img
-              className="h-[clamp(60px,18vw,72px)] w-full rounded-[11px] object-cover min-[700px]:h-[clamp(170px,18vw,235px)]"
-              src={foodImages.jollof}
-              alt="Jollof rice"
-            />
-            <h3 className="mx-[7px] mb-[3px] mt-[7px] text-xs font-bold text-[#16120f] min-[700px]:mb-[5px] min-[700px]:mt-[13px] min-[700px]:text-lg">
-              Jollof Rice
-            </h3>
-            <p className="mx-[7px] mb-1 hidden text-[11px] text-[#81766f] min-[700px]:block">
-              Classic Nigerian jollof rice.
-            </p>
-            <strong className="ml-[7px] block text-[11px] text-[#29211b] min-[700px]:text-xs">
-              From ₦2,500
-            </strong>
-            <button
-              className="absolute bottom-2 right-[7px] grid h-[26px] w-[26px] place-items-center rounded-full bg-gradient-to-br from-[#ff9a08] to-[#f45b14] text-[17px] font-extrabold text-white min-[700px]:bottom-3.5 min-[700px]:right-3.5 min-[700px]:h-[34px] min-[700px]:w-[34px]"
-              aria-label="Add Jollof rice"
-              onClick={() => {
-                onSelectRice("Jollof Rice");
-                onNavigate("customize");
-              }}
-            >
-              +
-            </button>
-          </article>
-          <article className="relative min-w-0 overflow-hidden rounded-[15px] border border-[#f2e4d8] bg-gradient-to-b from-[#fffdfa] to-[#fffaf5] px-1.5 pb-[9px] pt-[5px] shadow-[0_2px_7px_rgba(65,36,18,0.1)] transition hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(66,39,22,0.12)] min-[700px]:rounded-2xl min-[700px]:border-[#eee6de] min-[700px]:p-3">
-            <img
-              className="h-[clamp(60px,18vw,72px)] w-full rounded-[11px] object-cover min-[700px]:h-[clamp(170px,18vw,235px)]"
-              src={foodImages.mixed}
-              alt="Mixed rice"
-            />
-            <h3 className="mx-[7px] mb-[3px] mt-[7px] text-xs font-bold text-[#16120f] min-[700px]:mb-[5px] min-[700px]:mt-[13px] min-[700px]:text-lg">
-              Mixed Rice
-            </h3>
-            <p className="mx-[7px] mb-1 hidden text-[11px] text-[#81766f] min-[700px]:block">
-              A perfect blend of jollof and fried rice.
-            </p>
-            <strong className="ml-[7px] block text-[11px] text-[#29211b] min-[700px]:text-xs">
-              From ₦2,500
-            </strong>
-            <button
-              className="absolute bottom-2 right-[7px] grid h-[26px] w-[26px] place-items-center rounded-full bg-gradient-to-br from-[#ff9a08] to-[#f45b14] text-[17px] font-extrabold text-white min-[700px]:bottom-3.5 min-[700px]:right-3.5 min-[700px]:h-[34px] min-[700px]:w-[34px]"
-              aria-label="Add mixed rice"
-              onClick={() => {
-                onSelectRice("Mixed Rice");
-                onNavigate("customize");
-              }}
-            >
-              +
-            </button>
-          </article>
+          {menuItems.map((item) => (
+            <article key={item.id} className="relative min-w-0 overflow-hidden rounded-[15px] border border-[#f2e4d8] bg-gradient-to-b from-[#fffdfa] to-[#fffaf5] px-1.5 pb-[9px] pt-[5px] shadow-[0_2px_7px_rgba(65,36,18,0.1)] transition hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(66,39,22,0.12)] min-[700px]:rounded-2xl min-[700px]:border-[#eee6de] min-[700px]:p-3">
+              <img
+                className="h-[clamp(60px,18vw,72px)] w-full rounded-[11px] object-cover min-[700px]:h-[clamp(170px,18vw,235px)]"
+                src={item.image}
+                alt={item.name}
+              />
+              <h3 className="mx-[7px] mb-[3px] mt-[7px] text-xs font-bold text-[#16120f] min-[700px]:mb-[5px] min-[700px]:mt-[13px] min-[700px]:text-lg">
+                {item.name}
+              </h3>
+              <p className="mx-[7px] mb-1 hidden text-[11px] text-[#81766f] min-[700px]:block">
+                {item.description}
+              </p>
+              <strong className="ml-[7px] block text-[11px] text-[#29211b] min-[700px]:text-xs">
+                From ₦{item.price.toLocaleString()}
+              </strong>
+              <button
+                className="absolute bottom-2 right-[7px] grid h-[26px] w-[26px] place-items-center rounded-full bg-gradient-to-br from-[#ff9a08] to-[#f45b14] text-[17px] font-extrabold text-white min-[700px]:bottom-3.5 min-[700px]:right-3.5 min-[700px]:h-[34px] min-[700px]:w-[34px]"
+                aria-label={`Add ${item.name}`}
+                onClick={() => {
+                  onSelectRice(item.name);
+                  onNavigate("customize");
+                }}
+              >
+                +
+              </button>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -198,36 +174,20 @@ export function HomePage({ screen, onNavigate, onSelectRice }: HomePageProps) {
       </section>
 
       <section className="order-3 mx-2 grid min-h-[54px] flex-none grid-cols-3 gap-0.5 rounded-none bg-transparent px-[3px] py-0.5 min-[700px]:mx-auto min-[700px]:mb-[22px] min-[700px]:mt-[30px] min-[700px]:max-w-[1180px] min-[700px]:rounded-[14px] min-[700px]:border min-[700px]:border-[#eee5dd] min-[700px]:bg-[#fffaf6] min-[700px]:px-[26px] min-[700px]:py-[22px]">
-        <div className="grid grid-cols-[25px_1fr] items-center gap-1 min-[700px]:grid-cols-[42px_1fr] min-[700px]:gap-3">
-          <span className="grid h-6 w-6 place-items-center text-xl text-[#f27412] min-[700px]:h-[38px] min-[700px]:w-[38px] min-[700px]:rounded-full min-[700px]:bg-[#fff0e7] min-[700px]:text-lg">
-            ♨
-          </span>
-          <strong className="self-center text-[9px] leading-[1.05] text-[#2d2119] min-[700px]:text-xs">
-            Freshly
-            <br />
-            Prepared
-          </strong>
-        </div>
-        <div className="grid grid-cols-[25px_1fr] items-center gap-1 min-[700px]:grid-cols-[42px_1fr] min-[700px]:gap-3">
-          <span className="grid h-6 w-6 place-items-center text-xl text-[#f27412] min-[700px]:h-[38px] min-[700px]:w-[38px] min-[700px]:rounded-full min-[700px]:bg-[#fff0e7] min-[700px]:text-lg">
-            ✓
-          </span>
-          <strong className="self-center text-[9px] leading-[1.05] text-[#2d2119] min-[700px]:text-xs">
-            Secure
-            <br />
-            Payment
-          </strong>
-        </div>
-        <div className="grid grid-cols-[25px_1fr] items-center gap-1 min-[700px]:grid-cols-[42px_1fr] min-[700px]:gap-3">
-          <span className="grid h-6 w-6 place-items-center text-xl text-[#f27412] min-[700px]:h-[38px] min-[700px]:w-[38px] min-[700px]:rounded-full min-[700px]:bg-[#fff0e7] min-[700px]:text-lg">
-            ♧
-          </span>
-          <strong className="self-center text-[9px] leading-[1.05] text-[#2d2119] min-[700px]:text-xs">
-            Fast
-            <br />
-            Delivery
-          </strong>
-        </div>
+        {[
+          ["♨", "Freshly", "Prepared"],
+          ["✓", "Secure", "Payment"],
+          ["♧", "Fast", "Delivery"],
+        ].map(([icon, first, second]) => (
+          <div key={first} className="grid grid-cols-[25px_1fr] items-center gap-1 min-[700px]:grid-cols-[42px_1fr] min-[700px]:gap-3">
+            <span className="grid h-6 w-6 place-items-center text-xl text-[#f27412] min-[700px]:h-[38px] min-[700px]:w-[38px] min-[700px]:rounded-full min-[700px]:bg-[#fff0e7] min-[700px]:text-lg">
+              {icon}
+            </span>
+            <strong className="self-center text-[9px] leading-[1.05] text-[#2d2119] min-[700px]:text-xs">
+              {first}<br />{second}
+            </strong>
+          </div>
+        ))}
       </section>
       <BottomNav screen={screen} onNavigate={onNavigate} home />
     </div>

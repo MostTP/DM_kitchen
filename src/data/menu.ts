@@ -8,14 +8,14 @@ export const foodImages = {
 export const menuItems = [
   {
     id: 'jollof',
-    name: 'Jollof Rice',
+    name: 'Jollof Rice' as const,
     description: 'Classic Nigerian jollof rice.',
     price: 2500,
     image: foodImages.jollof,
   },
   {
     id: 'mixed',
-    name: 'Mixed Rice',
+    name: 'Mixed Rice' as const,
     description: 'A perfect blend of jollof and fried rice.',
     price: 2500,
     image: foodImages.mixed,

@@ -1,10 +1,9 @@
 import { foodImages } from '../../data/menu'
 import type { PlateSize, Protein, RiceType, Screen } from '../../types'
-import { screenClass } from '../../styles/classes'
+import { pageContentClass, primaryActionClass, quantityControlClass, screenClass } from '../../styles/classes'
 import { Header } from '../Header'
 
 interface CustomizePageProps {
-  screen: Screen
   rice: RiceType
   plate: PlateSize
   protein: Protein
@@ -32,7 +31,7 @@ export function CustomizePage(props: CustomizePageProps) {
   return (
     <div className={`${screenClass} pb-[60px]`}>
       <Header title="Customise Order" rightAction="cart" onNavigate={props.onNavigate} />
-      <div className="flex-1 overflow-y-auto px-[10px] pb-2 pt-1 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[1124px] min-[700px]:px-7 min-[700px]:py-6">
+      <div className={`${pageContentClass} px-[10px] pb-2 pt-1 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[1124px] min-[700px]:px-7 min-[700px]:py-6`}>
         <img
           className="mb-[10px] h-[132px] w-full rounded-[12px] object-cover object-center shadow-[0_2px_8px_rgba(74,49,32,0.08)] min-[700px]:mb-4 min-[700px]:h-[220px]"
           src={rice === 'Jollof Rice' ? foodImages.jollof : foodImages.mixed}
@@ -46,12 +45,12 @@ export function CustomizePage(props: CustomizePageProps) {
             {([['Jollof Rice', foodImages.jollof], ['Mixed Rice', foodImages.mixed]] as const).map(([name, image]) => (
               <button
                 key={name}
-                className={`${choiceClass} flex h-[105px] items-center gap-[7px] ${rice === name ? 'border-[#ff6b1a]' : 'border-[#eee5dd]'}`}
+                className={`${choiceClass} flex min-w-0 flex-col items-center justify-center gap-[5px] py-2 min-[700px]:h-[180px] ${rice === name ? 'border-[#ff6b1a]' : 'border-[#eee5dd]'}`}
                 onClick={() => props.onRiceChange(name)}
               >
                 {rice === name && <ChoiceMark />}
-                <img className="h-[76px] w-[76px] rounded-full object-cover" src={image} alt="" />
-                <strong className="flex-1 text-[9px]">{name}</strong>
+                <img className="h-[clamp(48px,18vw,76px)] w-[clamp(48px,18vw,76px)] rounded-full object-cover" src={image} alt="" />
+                <strong className="text-[clamp(8px,2.4vw,10px)]">{name}</strong>
               </button>
             ))}
           </div>
@@ -64,13 +63,13 @@ export function CustomizePage(props: CustomizePageProps) {
             {([['Medium', '₦2,500', foodImages.jollof], ['Big', '₦3,500', foodImages.mixed]] as const).map(([size, price, image]) => (
               <button
                 key={size}
-                className={`${choiceClass} flex h-[105px] items-center gap-[7px] ${plate === size ? 'border-[#ff6b1a]' : 'border-[#eee5dd]'}`}
+                className={`${choiceClass} flex min-w-0 flex-col items-center justify-center gap-[5px] py-2 min-[700px]:h-[205px] ${plate === size ? 'border-[#ff6b1a]' : 'border-[#eee5dd]'}`}
                 onClick={() => props.onPlateChange(size)}
               >
                 {plate === size && <ChoiceMark />}
-                <img className="h-[76px] w-[76px] rounded-full object-cover" src={image} alt="" />
-                <span className="text-left">
-                  <strong className="block text-[9px]">{size} Plate</strong>
+                <img className="h-[clamp(48px,18vw,76px)] w-[clamp(48px,18vw,76px)] rounded-full object-cover" src={image} alt="" />
+                <span className="text-center">
+                  <strong className="block text-[clamp(8px,2.4vw,10px)]">{size} Plate</strong>
                   <b className="mt-0.5 block text-[8px] font-semibold text-[#6f6259]">{price}</b>
                 </span>
               </button>
@@ -88,7 +87,7 @@ export function CustomizePage(props: CustomizePageProps) {
                 <div key={name} className="grid h-[43px] grid-cols-[32px_1fr_auto] items-center rounded-[8px] border border-[#eee5dd] bg-white px-[7px]">
                   <span className="text-[20px]">{name === 'Chicken' ? '🍗' : '🥩'}</span>
                   <strong className="text-[9px]">{name}</strong>
-                  <div className="flex h-[25px] items-center gap-2 rounded-full border border-[#e7e1dc] px-1.5">
+                  <div className={`${quantityControlClass} h-[25px] gap-2 px-1.5`}>
                     <button className="text-[13px]" aria-label={`Remove ${name}`} onClick={() => selected && props.onQuantityChange(Math.max(0, quantity - 1))}>−</button>
                     <span className="min-w-[14px] text-center text-[9px]">{selected ? quantity : 0}</span>
                     <button className="text-[13px]" aria-label={`Add ${name}`} onClick={() => name === 'Chicken' ? props.onQuantityChange(quantity + 1) : props.onProteinChange('Beef')}>+</button>
@@ -103,10 +102,7 @@ export function CustomizePage(props: CustomizePageProps) {
           <span className="text-[15px]">⌄</span>
         </button>
       </div>
-      <button
-        className="absolute bottom-[8px] left-[10px] right-[10px] h-[36px] rounded-full bg-[#ff6b12] text-[10px] font-bold text-white shadow-[0_3px_8px_rgba(217,93,42,0.2)] min-[700px]:relative min-[700px]:bottom-auto min-[700px]:left-auto min-[700px]:right-auto min-[700px]:mx-auto min-[700px]:mt-4 min-[700px]:block min-[700px]:h-[52px] min-[700px]:w-[min(560px,calc(100%-56px))] min-[700px]:text-sm"
-        onClick={() => props.onNavigate('cart')}
-      >
+      <button className={`${primaryActionClass} shadow-[0_3px_8px_rgba(217,93,42,0.2)]`} onClick={() => props.onNavigate('cart')}>
         Add to Cart <b className="ml-2">→</b>
       </button>
     </div>

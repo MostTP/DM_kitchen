@@ -74,14 +74,12 @@ function App() {
       )}
       {screen === "menu" && (
         <MenuPage
-          screen={screen}
           onNavigate={setScreen}
           onSelectRice={setRice}
         />
       )}
       {screen === "customize" && (
         <CustomizePage
-          screen={screen}
           rice={rice}
           plate={plate}
           protein={protein}

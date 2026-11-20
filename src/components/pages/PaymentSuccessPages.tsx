@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Screen } from '../../types'
 import { Header } from '../Header'
-import { screenClass } from '../../styles/classes'
+import { primaryActionClass, screenClass } from '../../styles/classes'
 
 interface PaymentPageProps {
   onNavigate: (screen: Screen) => void
@@ -44,10 +44,7 @@ export function PaymentPage({ onNavigate, onPay }: PaymentPageProps) {
         })}
       </div>
       <div className="mt-[9px] text-center text-[7px] text-[#716a64]"><span className="mr-1 text-[#ff941c]">♙</span>Your payment is secure and encrypted.</div>
-      <button
-        className="absolute bottom-[8px] left-[10px] right-[10px] h-[36px] rounded-full bg-[#ff6b12] text-[10px] font-bold text-white min-[700px]:relative min-[700px]:bottom-auto min-[700px]:left-auto min-[700px]:right-auto min-[700px]:mx-auto min-[700px]:mt-4 min-[700px]:block min-[700px]:h-[52px] min-[700px]:w-[min(560px,calc(100%-56px))] min-[700px]:text-sm"
-        onClick={onPay}
-      >
+      <button className={primaryActionClass} onClick={onPay}>
         Pay Now <b className="ml-1">→</b>
       </button>
     </div>
@@ -74,7 +71,7 @@ export function SuccessPage({ orderId, onNavigate }: { orderId: string; onNaviga
   return (
     <div className={`${screenClass} pb-2`}>
       <Header back={false} title="" rightAction="none" onNavigate={onNavigate} />
-      <div className="relative flex flex-1 flex-col items-center overflow-y-auto px-[14px] pb-2 pt-[8px] text-center">
+      <div className="relative flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-[14px] pb-2 pt-[8px] text-center">
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[100px] bg-[linear-gradient(0deg,rgba(255,235,214,.8),transparent)]" />
         <div className="mb-[5px] grid h-[48px] w-[48px] place-items-center rounded-full bg-[#20b968] text-[29px] font-bold text-white shadow-[0_0_0_8px_#e8f7ed]">✓</div>
         <h1 className="mb-[4px] mt-[5px] text-[20px] font-bold leading-[1.05]">Order Placed<br />Successfully!</h1>

@@ -1,10 +1,9 @@
 import { menuItems } from '../../data/menu'
 import type { RiceType, Screen } from '../../types'
 import { Header } from '../Header'
-import { screenClass } from '../../styles/classes'
+import { pageContentClass, quantityControlClass, screenClass } from '../../styles/classes'
 
 interface MenuPageProps {
-  screen: Screen
   onNavigate: (screen: Screen) => void
   onSelectRice: (rice: RiceType) => void
 }
@@ -18,7 +17,7 @@ export function MenuPage({ onNavigate, onSelectRice }: MenuPageProps) {
   return (
     <div className={`${screenClass} pb-0`}>
       <Header title="Our Menu" rightAction="cart" onNavigate={onNavigate} />
-      <div className="flex-1 overflow-y-auto px-[10px] pb-3 pt-1 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[1124px] min-[700px]:px-7 min-[700px]:py-6">
+      <div className={`${pageContentClass} px-[10px] pb-3 pt-1 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[1124px] min-[700px]:px-7 min-[700px]:py-6`}>
         <div className="mb-[7px] flex h-[30px] items-center gap-[5px]">
           {['Rice Packages', 'Extras', 'Drinks'].map((tab, index) => (
             <button
@@ -65,7 +64,7 @@ export function MenuPage({ onNavigate, onSelectRice }: MenuPageProps) {
             <div key={name} className="mb-[5px] grid h-[40px] grid-cols-[25px_1fr_auto] items-center rounded-[8px] border border-[#eee5dd] bg-white px-[7px]">
               <span className="text-[16px]">{emoji}</span>
               <span className="text-[8px] font-medium">{name}<small className="block text-[7px] text-[#7d736c]">{price}</small></span>
-              <div className="flex h-[24px] items-center gap-2 rounded-full border border-[#e7e1dc] px-1.5 text-[8px]">
+              <div className={`${quantityControlClass} h-[24px] gap-2 px-1.5`}>
                 <button aria-label={`Remove ${name}`}>−</button><span>0</span><button aria-label={`Add ${name}`}>+</button>
               </div>
             </div>

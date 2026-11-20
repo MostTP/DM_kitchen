@@ -1,5 +1,14 @@
 export const screenClass =
-  "relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col overflow-hidden rounded-[26px] border-2 border-[#f3bd83] bg-[#fff8f1] pb-[72px] shadow-[0_0_40px_rgba(62,40,25,0.08)] min-[700px]:mx-0 min-[700px]:max-w-none min-[700px]:rounded-none min-[700px]:border-0 min-[700px]:bg-[#fffdfa] min-[700px]:pb-10 min-[700px]:shadow-none";
+  "relative mx-auto flex h-svh min-h-svh w-full max-w-[430px] flex-col overflow-hidden rounded-[26px] border-2 border-[#f3bd83] bg-[#fff8f1] pb-[60px] shadow-[0_0_40px_rgba(62,40,25,0.08)] min-[700px]:mx-0 min-[700px]:h-auto min-[700px]:min-h-screen min-[700px]:max-w-none min-[700px]:rounded-none min-[700px]:border-0 min-[700px]:bg-[#fffdfa] min-[700px]:pb-10 min-[700px]:shadow-none";
+
+export const pageContentClass =
+  "min-h-0 flex-1 overflow-y-auto overscroll-contain";
+
+export const primaryActionClass =
+  "absolute inset-x-[10px] bottom-[8px] flex h-10 items-center justify-center rounded-full bg-[#ff6b12] text-[10px] font-bold text-white min-[700px]:static min-[700px]:mx-auto min-[700px]:mt-4 min-[700px]:h-[52px] min-[700px]:w-[min(560px,calc(100%-56px))] min-[700px]:text-sm";
+
+export const quantityControlClass =
+  "flex items-center rounded-full border border-[#e7e1dc] text-[8px]";
 
 export const headerClass =
   "shrink-0 border-b border-[#eee6df] bg-[#fffaf6] min-[700px]:mx-auto min-[700px]:flex min-[700px]:h-[76px] min-[700px]:w-full min-[700px]:max-w-[1180px] min-[700px]:items-center min-[700px]:gap-[18px] min-[700px]:border-0 min-[700px]:bg-transparent min-[700px]:px-8";

@@ -3,7 +3,7 @@ import type { CustomerDetails, Screen } from '../../types'
 import { foodImages } from '../../data/menu'
 import { Header } from '../Header'
 import { Icon } from '../Icon'
-import { screenClass } from '../../styles/classes'
+import { pageContentClass, primaryActionClass, quantityControlClass, screenClass } from '../../styles/classes'
 
 interface CartPageProps {
   rice: string
@@ -21,7 +21,7 @@ export function CartPage({ rice, plate, quantity, onNavigate }: CartPageProps) {
   return (
     <div className={`${screenClass} pb-[60px]`}>
       <Header title="Your Cart" rightAction="trash" onNavigate={onNavigate} />
-      <div className="flex-1 px-[10px] pt-[7px] min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[1124px] min-[700px]:px-7 min-[700px]:py-6">
+      <div className={`${pageContentClass} px-[10px] pt-[7px] min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[1124px] min-[700px]:px-7 min-[700px]:py-6`}>
         <div className="space-y-[6px]">
           {entries.map((item, index) => (
             <CartItem key={`${item.name}-${index}`} {...item} />
@@ -34,10 +34,7 @@ export function CartPage({ rice, plate, quantity, onNavigate }: CartPageProps) {
           <div className="mt-[3px] flex justify-between border-t border-[#eee2d8] pt-[5px] text-[12px] font-bold"><span>Total</span><b className="text-[#ff6417]">₦55,000</b></div>
         </div>
       </div>
-      <button
-        className="absolute bottom-[8px] left-[10px] right-[10px] h-[36px] rounded-full bg-[#ff6b12] text-[10px] font-bold text-white min-[700px]:relative min-[700px]:bottom-auto min-[700px]:left-auto min-[700px]:right-auto min-[700px]:mx-auto min-[700px]:mt-4 min-[700px]:block min-[700px]:h-[52px] min-[700px]:w-[min(560px,calc(100%-56px))] min-[700px]:text-sm"
-        onClick={() => onNavigate('checkout')}
-      >
+      <button className={primaryActionClass} onClick={() => onNavigate('checkout')}>
         Proceed to Checkout <b className="ml-1">→</b>
       </button>
     </div>
@@ -69,7 +66,7 @@ function CartItem({ image, name, size, protein, price, drink = false }: CartItem
       </div>
       <div className="flex h-full flex-col items-end justify-between">
         <button className="text-[#918780]" aria-label={`Remove ${name}`}><Icon name="trash" size={12} /></button>
-        <div className="flex h-[21px] items-center gap-[7px] rounded-full border border-[#e7e1dc] px-[6px] text-[8px]">
+        <div className={`${quantityControlClass} h-[21px] gap-[7px] px-[6px]`}>
           <button aria-label={`Decrease ${name} quantity`}>−</button><span>10</span><button aria-label={`Increase ${name} quantity`}>+</button>
         </div>
       </div>
@@ -90,7 +87,7 @@ export function CheckoutPage({ customer, onCustomerChange, onNavigate }: Checkou
   return (
     <div className={`${screenClass} pb-[60px]`}>
       <Header title="Checkout" onNavigate={onNavigate} />
-      <form className="flex-1 overflow-y-auto px-[10px] pb-2 pt-[6px] min-[700px]:mx-auto min-[700px]:my-3 min-[700px]:w-full min-[700px]:max-w-[720px] min-[700px]:p-5">
+      <form className={`${pageContentClass} px-[10px] pb-2 pt-[6px] min-[700px]:mx-auto min-[700px]:my-3 min-[700px]:w-full min-[700px]:max-w-[720px] min-[700px]:p-5`}>
         <div className="grid h-[37px] grid-cols-2 gap-[5px] rounded-[9px] border border-[#eee3da] p-[3px]">
           <button type="button" onClick={() => setDelivery(true)} className={`flex items-center justify-center gap-[5px] rounded-[7px] text-[9px] ${delivery ? 'border border-[#ff6b1a] bg-[#fff0e7] font-bold text-[#e9550b]' : 'text-[#685f59]'}`}><Icon name="truck" size={14} />Delivery</button>
           <button type="button" onClick={() => setDelivery(false)} className={`flex items-center justify-center gap-[5px] rounded-[7px] text-[9px] ${!delivery ? 'border border-[#ff6b1a] bg-[#fff0e7] font-bold text-[#e9550b]' : 'text-[#685f59]'}`}><Icon name="bag" size={14} />Collection</button>
@@ -111,10 +108,7 @@ export function CheckoutPage({ customer, onCustomerChange, onNavigate }: Checkou
           />
         </label>
       </form>
-      <button
-        className="absolute bottom-[8px] left-[10px] right-[10px] h-[36px] rounded-full bg-[#ff6b12] text-[10px] font-bold text-white min-[700px]:relative min-[700px]:bottom-auto min-[700px]:left-auto min-[700px]:right-auto min-[700px]:mx-auto min-[700px]:mt-4 min-[700px]:block min-[700px]:h-[52px] min-[700px]:w-[min(560px,calc(100%-56px))] min-[700px]:text-sm"
-        onClick={() => onNavigate('payment')}
-      >
+      <button className={primaryActionClass} onClick={() => onNavigate('payment')}>
         Continue to Payment <b className="ml-1">→</b>
       </button>
     </div>

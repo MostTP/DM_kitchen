@@ -1,0 +1,101 @@
+import { useState } from 'react'
+import type { Screen } from '../../types'
+import { Header } from '../Header'
+import { screenClass } from '../../styles/classes'
+
+interface PaymentPageProps {
+  onNavigate: (screen: Screen) => void
+  onPay: () => void
+}
+
+const paymentMethods = [
+  { icon: '◉', label: 'Card Payment', brand: 'VISA  ●●' },
+  { icon: '▤', label: 'Bank Transfer', brand: '' },
+  { icon: '▯', label: 'USSD', brand: '' },
+  { icon: 'ϟ', label: 'Pay with Paystack', brand: '' },
+]
+
+export function PaymentPage({ onNavigate, onPay }: PaymentPageProps) {
+  const [selected, setSelected] = useState('Card Payment')
+
+  return (
+    <div className={`${screenClass} pb-[60px]`}>
+      <Header title="Payment" onNavigate={onNavigate} rightAction="none" />
+      <div className="mx-[10px] mt-[7px] flex h-[60px] flex-col items-center justify-center rounded-[10px] border border-[#eee5dd] bg-[#fffaf6] min-[700px]:mx-auto min-[700px]:mt-7 min-[700px]:h-[110px] min-[700px]:max-w-[1124px]">
+        <span className="text-[8px]">Amount to Pay</span>
+        <strong className="text-[20px] leading-tight">₦55,000</strong>
+      </div>
+      <h3 className="mx-[10px] mb-[5px] mt-[9px] text-[10px] font-bold min-[700px]:mx-auto min-[700px]:mt-[22px] min-[700px]:max-w-[680px] min-[700px]:text-base">Choose Payment Method</h3>
+      <div className="space-y-[4px] px-[10px] min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[680px]">
+        {paymentMethods.map((method) => {
+          const active = selected === method.label
+          return (
+            <button
+              key={method.label}
+              onClick={() => setSelected(method.label)}
+              className={`grid h-[35px] w-full grid-cols-[25px_1fr_auto] items-center rounded-[8px] border bg-white px-[7px] text-left ${active ? 'border-[#ff6b1a]' : 'border-[#eee5dd]'}`}
+            >
+              <span className={`grid h-[17px] w-[17px] place-items-center rounded-full text-[10px] ${active ? 'bg-[#ff701a] text-white' : 'bg-[#f5f0ec] text-[#81766f]'}`}>{active ? '✓' : method.icon}</span>
+              <strong className="text-[9px]">{method.label}</strong>
+              {method.brand && <span className="mr-1 text-[9px] font-black italic text-[#2353a3]">{method.brand}</span>}
+              {active && <span className="ml-1 grid h-[13px] w-[13px] place-items-center rounded-full bg-[#ff711a] text-[8px] text-white">✓</span>}
+            </button>
+          )
+        })}
+      </div>
+      <div className="mt-[9px] text-center text-[7px] text-[#716a64]"><span className="mr-1 text-[#ff941c]">♙</span>Your payment is secure and encrypted.</div>
+      <button
+        className="absolute bottom-[8px] left-[10px] right-[10px] h-[36px] rounded-full bg-[#ff6b12] text-[10px] font-bold text-white min-[700px]:relative min-[700px]:bottom-auto min-[700px]:left-auto min-[700px]:right-auto min-[700px]:mx-auto min-[700px]:mt-4 min-[700px]:block min-[700px]:h-[52px] min-[700px]:w-[min(560px,calc(100%-56px))] min-[700px]:text-sm"
+        onClick={onPay}
+      >
+        Pay Now <b className="ml-1">→</b>
+      </button>
+    </div>
+  )
+}
+
+const qrRows = [
+  '1111111001011',
+  '1000001011101',
+  '1011101010011',
+  '1011101001110',
+  '1011101010101',
+  '1000001011010',
+  '1111111010101',
+  '0000000010110',
+  '1101011110101',
+  '0110110011100',
+  '1011101011011',
+  '0010110100101',
+  '1101011101110',
+]
+
+export function SuccessPage({ orderId, onNavigate }: { orderId: string; onNavigate: (screen: Screen) => void }) {
+  return (
+    <div className={`${screenClass} pb-2`}>
+      <Header back={false} title="" rightAction="none" onNavigate={onNavigate} />
+      <div className="relative flex flex-1 flex-col items-center overflow-y-auto px-[14px] pb-2 pt-[8px] text-center">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[100px] bg-[linear-gradient(0deg,rgba(255,235,214,.8),transparent)]" />
+        <div className="mb-[5px] grid h-[48px] w-[48px] place-items-center rounded-full bg-[#20b968] text-[29px] font-bold text-white shadow-[0_0_0_8px_#e8f7ed]">✓</div>
+        <h1 className="mb-[4px] mt-[5px] text-[20px] font-bold leading-[1.05]">Order Placed<br />Successfully!</h1>
+        <p className="mb-[3px] text-[8px]">Your Order ID is:</p>
+        <strong className="mb-[7px] flex items-center gap-2 rounded-full border border-[#f1d4c4] bg-[#fff0e8] px-[10px] py-[5px] text-[8px]">{orderId}<span aria-hidden="true">▢</span></strong>
+        <div className="grid h-[119px] w-[119px] grid-cols-[repeat(13,minmax(0,1fr))] grid-rows-[repeat(13,minmax(0,1fr))] gap-[2px] rounded-[5px] border border-[#eee5dd] bg-white p-[7px] shadow-[0_3px_14px_rgba(50,30,20,0.08)]">
+          {qrRows.flatMap((row, rowIndex) => [...row].map((cell, columnIndex) => (
+            <span key={`${rowIndex}-${columnIndex}`} className={cell === '1' ? 'bg-[#191715]' : 'bg-white'} />
+          )))}
+        </div>
+        <small className="mt-[5px] text-[7px] leading-tight text-[#6f6963]">Scan this QR code<br />at pickup or delivery</small>
+        <button
+          className="z-[1] mt-[9px] h-[35px] w-full max-w-[330px] rounded-full bg-[#ff6b12] text-[10px] font-bold text-white"
+          onClick={() => onNavigate('track')}
+        >
+          Track My Order <b className="ml-1">→</b>
+        </button>
+        <button className="z-[1] mt-[5px] h-[28px] w-full max-w-[330px] rounded-full border border-[#f3ddca] bg-[#fff8f1] text-[8px] font-semibold" onClick={() => onNavigate('home')}>⌂ Back to Home</button>
+        <div className="pointer-events-none absolute bottom-0 left-0 h-[68px] w-[65px] bg-[url('https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=240&q=70')] bg-cover bg-center opacity-90" />
+        <div className="pointer-events-none absolute bottom-0 right-0 h-[68px] w-[65px] bg-[url('https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=240&q=70')] bg-cover bg-center opacity-90" />
+      </div>
+    </div>
+  )
+}

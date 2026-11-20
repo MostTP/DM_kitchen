@@ -5,7 +5,7 @@ import { primaryActionClass, screenClass } from '../../styles/classes'
 
 interface PaymentPageProps {
   onNavigate: (screen: Screen) => void
-  onPay: () => void
+  onPay: () => Promise<void>
 }
 
 const paymentMethods = [
@@ -17,6 +17,20 @@ const paymentMethods = [
 
 export function PaymentPage({ onNavigate, onPay }: PaymentPageProps) {
   const [selected, setSelected] = useState('Card Payment')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const pay = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      await onPay()
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Unable to start payment.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className={`${screenClass} pb-[60px]`}>
@@ -44,8 +58,9 @@ export function PaymentPage({ onNavigate, onPay }: PaymentPageProps) {
         })}
       </div>
       <div className="mt-[9px] text-center text-[7px] text-[#716a64]"><span className="mr-1 text-[#ff941c]">♙</span>Your payment is secure and encrypted.</div>
-      <button className={primaryActionClass} onClick={onPay}>
-        Pay Now <b className="ml-1">→</b>
+      {error && <p role="alert" className="mx-3 mt-2 text-center text-[10px] text-red-700">{error}</p>}
+      <button className={primaryActionClass} onClick={() => void pay()} disabled={loading}>
+        {loading ? 'Connecting to Paystack…' : <>Pay Now <b className="ml-1">→</b></>}
       </button>
     </div>
   )

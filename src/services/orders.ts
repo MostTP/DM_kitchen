@@ -1,15 +1,26 @@
 import type { CustomerDetails, Order } from '../types'
 
-export async function initializeOrder(order: Order): Promise<{ authorizationUrl: string; reference: string }> {
+export interface TrackedOrder {
+  orderId: string
+  status: string
+  paymentStatus: Order['paymentStatus']
+  total: number
+  createdAt: string
+}
+
+async function getError(response: Response, fallback: string) {
+  const body = await response.json().catch(() => null)
+  return new Error(typeof body?.error === 'string' ? body.error : fallback)
+}
+
+export async function initializeOrder(order: Order): Promise<{ authorizationUrl: string; reference: string; orderId: string }> {
   const response = await fetch('/api/payments/initialize', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(order),
   })
 
-  if (!response.ok) {
-    throw new Error('Unable to start payment')
-  }
+  if (!response.ok) throw await getError(response, 'Unable to start payment')
 
   return response.json()
 }
@@ -17,19 +28,15 @@ export async function initializeOrder(order: Order): Promise<{ authorizationUrl:
 export async function verifyOrder(reference: string): Promise<Order> {
   const response = await fetch(`/api/payments/verify/${encodeURIComponent(reference)}`)
 
-  if (!response.ok) {
-    throw new Error('Unable to verify payment')
-  }
+  if (!response.ok) throw await getError(response, 'Unable to verify payment')
 
   return response.json()
 }
 
-export async function trackOrder(orderId: string): Promise<Order> {
+export async function trackOrder(orderId: string): Promise<TrackedOrder> {
   const response = await fetch(`/api/orders/${encodeURIComponent(orderId)}`)
 
-  if (!response.ok) {
-    throw new Error('Order not found')
-  }
+  if (!response.ok) throw await getError(response, 'Unable to find order')
 
   return response.json()
 }

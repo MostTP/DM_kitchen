@@ -52,13 +52,9 @@ function App() {
 
   const handlePay = async () => {
     const demoOrder = await createLocalDemoOrder(customer);
-    try {
-      const result = await initializeOrder(demoOrder);
-      setOrderId(result.reference);
-      window.location.assign(result.authorizationUrl);
-    } catch {
-      setScreen("success");
-    }
+    const result = await initializeOrder(demoOrder);
+    setOrderId(result.orderId);
+    window.location.assign(result.authorizationUrl);
   };
 
   return (

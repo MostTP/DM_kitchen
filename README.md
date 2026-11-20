@@ -10,11 +10,11 @@ DMK is a responsive React ordering application with a Supabase database, Paystac
 npm install
 ```
 
-2. Copy `.env.example` to `.env` and add your Supabase, Paystack, and SMTP credentials.
+2. Copy `.env.example` to `.env.local` and add your Supabase and Paystack credentials. SMTP is optional; confirmation emails are disabled until its settings are filled in.
 
 3. Apply `migrations/001_create_orders.sql` in the Supabase SQL editor.
 
-4. Start the API:
+4. Start the API (it loads `.env.local` or `.env`):
 
 ```bash
 npm run server

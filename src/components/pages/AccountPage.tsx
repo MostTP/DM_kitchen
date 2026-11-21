@@ -4,6 +4,7 @@ import type { Screen } from '../../types'
 import { supabase } from '../../lib/supabase'
 import type { AccountOrder } from '../../services/orders'
 import { BottomNav } from '../BottomNav'
+import { BrandLogo } from '../BrandLogo'
 import { Header } from '../Header'
 import { ScreenLink } from '../ScreenLink'
 import { primaryActionClass, screenClass } from '../../styles/classes'
@@ -233,7 +234,9 @@ export function AccountPage({
         ) : (
           <section className="mx-auto max-w-[520px] overflow-hidden rounded-3xl border border-[#eee5dd] bg-white shadow-[0_12px_35px_rgba(74,49,32,0.08)]">
             <div className="bg-[#30231c] px-6 py-7 text-white min-[700px]:px-8">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#ff791c] text-lg font-black">DMK</span>
+              <span className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-white p-1.5">
+                <BrandLogo className="h-full w-full object-contain" />
+              </span>
               <p className="mt-5 text-xs font-bold uppercase tracking-[0.14em] text-[#ffd0a9]">Your kitchen, your orders</p>
               <h2 className="mt-2 text-2xl font-bold">Welcome back</h2>
               <p className="mt-2 text-sm leading-relaxed text-white/70">Sign in to keep your order history and updates together in one place.</p>

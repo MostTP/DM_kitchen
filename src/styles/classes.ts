@@ -11,7 +11,7 @@ export const headerClass =
   "relative z-10 shrink-0 border-b border-[#eee6df] bg-[#fffaf6] min-[700px]:h-20 min-[700px]:w-full min-[700px]:border-[#eee7e1] min-[700px]:bg-white/95 min-[700px]:shadow-[0_2px_12px_rgba(54,37,25,0.04)]";
 
 export const iconButtonClass =
-  "grid h-9 w-9 place-items-center border-0 bg-transparent text-[#25201d] min-[700px]:hidden";
+  "grid h-11 w-11 place-items-center border-0 bg-transparent text-[#25201d] min-[700px]:hidden";
 
 export const desktopNavClass =
   "hidden items-center gap-[clamp(20px,2.4vw,36px)] whitespace-nowrap text-[#2d241f] min-[700px]:col-start-2 min-[700px]:row-start-1 min-[700px]:flex min-[700px]:justify-self-end";
@@ -20,7 +20,7 @@ export const desktopNavButtonClass =
   "border-0 bg-transparent py-2.5 text-[13px] font-semibold";
 
 export const screenTitleClass =
-  "m-0 text-center text-base font-bold min-[700px]:col-start-1 min-[700px]:row-start-1 min-[700px]:ml-0 min-[700px]:justify-self-start min-[700px]:text-left min-[700px]:text-xl min-[700px]:tracking-tight";
+  "m-0 text-center text-lg font-bold min-[700px]:col-start-1 min-[700px]:row-start-1 min-[700px]:ml-0 min-[700px]:justify-self-start min-[700px]:text-left min-[700px]:text-xl min-[700px]:tracking-tight";
 
 export const bottomNavClass =
   "fixed bottom-0 left-0 z-20 grid h-[54px] w-full grid-cols-4 items-center border-t border-[#eee6df] bg-[#fffaf6] min-[700px]:hidden";

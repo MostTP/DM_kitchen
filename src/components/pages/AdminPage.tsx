@@ -7,6 +7,7 @@ import {
   verifyAdminOrder,
   type AccountOrder,
 } from '../../services/orders'
+import { BrandLogo } from '../BrandLogo'
 import { Header } from '../Header'
 import { ScreenLink } from '../ScreenLink'
 import { pageContentClass, screenClass } from '../../styles/classes'
@@ -142,7 +143,9 @@ export function AdminPage({
       <div className={`${pageContentClass} px-4 pb-8 pt-4 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[1280px] min-[700px]:px-8 min-[700px]:py-7`}>
         {!session ? (
           <section className="mx-auto max-w-xl rounded-3xl border border-[#eee5dd] bg-white p-7 text-center shadow-sm">
-            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#30231c] text-sm font-black text-white">DMK</div>
+            <div className="mx-auto grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-white p-2 shadow-sm">
+              <BrandLogo className="h-full w-full object-contain" />
+            </div>
             <h2 className="mt-4 text-xl font-bold">Staff access required</h2>
             <p className="mt-2 text-sm text-[#77706a]">Sign in with an approved admin account to manage orders.</p>
             <ScreenLink to="admin-login" onNavigate={onNavigate} className="mt-5 inline-flex min-h-11 items-center rounded-full bg-[#ff701a] px-5 text-sm font-bold text-white">

@@ -1,5 +1,6 @@
 import type { Screen } from '../types'
 import { desktopNavButtonClass, desktopNavClass, headerClass, iconButtonClass, screenTitleClass } from '../styles/classes'
+import { BrandLogo } from './BrandLogo'
 import { Icon } from './Icon'
 import { ScreenLink } from './ScreenLink'
 
@@ -22,7 +23,7 @@ export function Header({
 }: HeaderProps) {
   return (
     <header className={headerClass}>
-      <div className="mx-auto grid h-[40px] w-full grid-cols-[36px_1fr_36px] items-center px-[10px] min-[700px]:h-full min-[700px]:max-w-[1440px] min-[700px]:grid-cols-[minmax(0,1fr)_auto] min-[700px]:gap-8 min-[700px]:px-8">
+      <div className="mx-auto grid h-14 w-full grid-cols-[44px_minmax(0,1fr)_44px] items-center px-4 min-[700px]:h-full min-[700px]:max-w-[1440px] min-[700px]:grid-cols-[minmax(0,1fr)_auto] min-[700px]:gap-8 min-[700px]:px-8">
         {back ? (
           <ScreenLink
             to={backTarget}
@@ -33,9 +34,7 @@ export function Header({
             <Icon name="back" size={18} />
           </ScreenLink>
         ) : title ? (
-          <div className="grid h-[30px] w-[30px] place-items-center rounded-full bg-dmk-orange font-serif font-black text-white min-[700px]:hidden">
-            D<span className="-ml-1 mt-[5px] self-start text-[9px]">✦</span>
-          </div>
+          <BrandLogo className="h-[30px] w-[42px] rounded-md bg-white p-1 object-contain min-[700px]:hidden" />
         ) : (
           <span className="min-[700px]:hidden" />
         )}

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
 import { getAdminOrders } from '../../services/orders'
 import type { Screen } from '../../types'
+import { BrandLogo } from '../BrandLogo'
 import { Header } from '../Header'
 import { ScreenLink } from '../ScreenLink'
 import { primaryActionClass, screenClass } from '../../styles/classes'
@@ -57,7 +58,9 @@ export function AdminLoginPage({
       <Header title="Admin Sign In" backTarget="track" onNavigate={onNavigate} rightAction="none" />
       <div className="flex-1 overflow-y-auto px-4 py-8 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[520px] min-[700px]:pt-16">
         <form onSubmit={(event) => void signIn(event)} className="rounded-3xl border border-[#eee5dd] bg-white p-6 shadow-[0_12px_35px_rgba(74,49,32,0.08)] min-[700px]:p-8">
-          <div className="grid h-14 w-14 place-items-center rounded-2xl bg-[#30231c] text-lg font-black text-white">DMK</div>
+          <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-white p-2 shadow-sm">
+            <BrandLogo className="h-full w-full object-contain" />
+          </div>
           <p className="mt-5 text-xs font-bold uppercase tracking-[0.14em] text-[#e9550b]">Staff access</p>
           <h2 className="mt-2 text-2xl font-bold">Admin dashboard</h2>
           <p className="mt-2 text-sm leading-relaxed text-[#77706a]">Sign in with your admin email and password to manage orders.</p>

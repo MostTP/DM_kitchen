@@ -22,7 +22,7 @@ export function Header({
 }: HeaderProps) {
   return (
     <header className={headerClass}>
-      <div className="grid h-[40px] grid-cols-[36px_1fr_36px] items-center px-[10px] min-[700px]:flex min-[700px]:h-full min-[700px]:px-0">
+      <div className="mx-auto grid h-[40px] w-full grid-cols-[36px_1fr_36px] items-center px-[10px] min-[700px]:h-full min-[700px]:max-w-[1440px] min-[700px]:grid-cols-[minmax(0,1fr)_auto] min-[700px]:gap-8 min-[700px]:px-8">
         {back ? (
           <ScreenLink
             to={backTarget}
@@ -37,7 +37,7 @@ export function Header({
             D<span className="-ml-1 mt-[5px] self-start text-[9px]">✦</span>
           </div>
         ) : (
-          <span />
+          <span className="min-[700px]:hidden" />
         )}
         {title && <h2 className={screenTitleClass}>{title}</h2>}
         {rightAction !== 'none' ? (
@@ -61,7 +61,7 @@ export function Header({
             )}
           </ScreenLink>
         ) : (
-          <span />
+          <span className="min-[700px]:hidden" />
         )}
         <nav className={desktopNavClass} aria-label="Main navigation">
           <ScreenLink to="home" onNavigate={onNavigate} className={desktopNavButtonClass}>Home</ScreenLink>

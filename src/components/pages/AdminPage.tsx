@@ -207,9 +207,9 @@ export function AdminPage({
                   autoCapitalize="characters"
                   autoComplete="off"
                   required
-                  className="h-12 min-w-0 flex-1 rounded-xl border border-[#e8d9cd] bg-white px-4 font-mono text-sm tracking-wide outline-none transition placeholder:font-sans placeholder:tracking-normal focus:border-[#f07830] focus:ring-4 focus:ring-[#ff791c]/10"
+                  className="box-border h-12 min-h-12 w-full shrink-0 rounded-xl border border-[#e8d9cd] bg-white px-4 font-mono text-base leading-normal tracking-wide outline-none transition placeholder:font-sans placeholder:tracking-normal focus:border-[#f07830] focus:ring-4 focus:ring-[#ff791c]/10 min-[700px]:min-w-0 min-[700px]:flex-1 min-[700px]:text-sm"
                 />
-                <button type="submit" disabled={verifying} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#e95c13] px-5 text-sm font-bold text-white shadow-sm transition hover:bg-[#d9500c] disabled:opacity-60 min-[700px]:min-w-40">
+                <button type="submit" disabled={verifying} className="inline-flex h-12 min-h-12 w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[#e95c13] px-5 text-sm font-bold text-white shadow-sm transition hover:bg-[#d9500c] disabled:opacity-60 min-[700px]:w-auto min-[700px]:min-w-40">
                   {verifying ? 'Checking code…' : 'Verify code'}
                 </button>
               </form>

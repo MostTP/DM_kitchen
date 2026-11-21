@@ -26,6 +26,7 @@ Use `npm run dev:web` only when the API is already running separately.
 
 ## Production configuration
 
+- When deploying the Vite frontend to Vercel, keep the repository's `vercel.json` SPA rewrite. It serves `index.html` for client-side routes such as `/account` and `/admin`; redeploy after adding or changing the rewrite.
 - Keep Supabase service-role, Paystack secret, and SMTP credentials only on the API server.
 - Deploy `server/index.js` as a publicly reachable API service. In the frontend host's build environment, set `VITE_API_URL` to that service's origin (for example, `https://api.your-domain.example`, without `/api`) and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`; rebuild and redeploy the frontend after changing these values. These browser values are public; never use the service-role key as the anon key.
 - On the API host, set `APP_ORIGIN` to the exact frontend origin (for example, `https://your-domain.example`, without a path). Multiple allowed frontend origins can be comma-separated. The API must be reachable over HTTPS from the deployed site.

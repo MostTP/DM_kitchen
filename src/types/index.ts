@@ -7,6 +7,8 @@ export type Screen =
   | 'payment'
   | 'success'
   | 'track'
+  | 'admin'
+  | 'admin-login'
 
 export type RiceType = 'Jollof Rice' | 'Mixed Rice'
 export type PlateSize = 'Medium' | 'Big'
@@ -40,4 +42,14 @@ export interface Order {
   deliveryFee: number
   total: number
   paymentStatus: 'pending' | 'paid'
+  status?: string
+  createdAt?: string
 }
+
+export type OrderStatus =
+  | 'new'
+  | 'preparing'
+  | 'ready'
+  | 'out_for_delivery'
+  | 'completed'
+  | 'cancelled'

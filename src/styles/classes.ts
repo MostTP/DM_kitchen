@@ -1,8 +1,8 @@
 export const screenClass =
-  "relative flex h-svh min-h-svh w-full flex-col overflow-hidden bg-[#fff8f1] pb-[60px] min-[700px]:h-auto min-[700px]:min-h-screen min-[700px]:bg-[#fffdfa] min-[700px]:pb-10";
+  "relative flex h-svh min-h-svh w-full flex-col overflow-hidden bg-[#fff8f1] pb-[60px] min-[700px]:h-auto min-[700px]:min-h-screen min-[700px]:overflow-visible min-[700px]:bg-[#fffdfa] min-[700px]:pb-10";
 
 export const pageContentClass =
-  "min-h-0 flex-1 overflow-y-auto overscroll-contain";
+  "min-h-0 flex-1 overflow-y-auto overscroll-contain min-[700px]:flex-none min-[700px]:overflow-visible";
 
 export const primaryActionClass =
   "absolute inset-x-4 bottom-2 flex h-12 items-center justify-center rounded-full bg-[#ff6b12] text-sm font-bold text-white min-[700px]:static min-[700px]:mx-auto min-[700px]:mt-4 min-[700px]:h-[52px] min-[700px]:w-[min(560px,calc(100%-56px))]";

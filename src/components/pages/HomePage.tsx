@@ -2,6 +2,7 @@ import { menuItems } from "../../data/menu";
 import type { RiceType, Screen } from "../../types";
 import { BottomNav } from "../BottomNav";
 import { Icon } from "../Icon";
+import { ScreenLink } from "../ScreenLink";
 
 interface HomePageProps {
   screen: Screen;
@@ -27,30 +28,34 @@ export function HomePage({ screen, onNavigate, onSelectRice, cartCount }: HomePa
           className="flex items-center gap-[clamp(18px,3vw,42px)]"
           aria-label="Main navigation"
         >
-          <button
+          <ScreenLink
+            to="home"
+            onNavigate={onNavigate}
             className="py-2.5 text-[13px] font-semibold text-[#f39a5a]"
-            onClick={() => onNavigate("home")}
           >
             Home
-          </button>
-          <button
+          </ScreenLink>
+          <ScreenLink
+            to="menu"
+            onNavigate={onNavigate}
             className="py-2.5 text-[13px] font-semibold"
-            onClick={() => onNavigate("menu")}
           >
             Our Menu
-          </button>
-          <button
+          </ScreenLink>
+          <ScreenLink
+            to="track"
+            onNavigate={onNavigate}
             className="py-2.5 text-[13px] font-semibold"
-            onClick={() => onNavigate("track")}
           >
-            Track Order
-          </button>
-          <button
+            My Account
+          </ScreenLink>
+          <ScreenLink
+            to="cart"
+            onNavigate={onNavigate}
             className="flex items-center gap-2 rounded-[7px] border border-white/35 px-[15px] py-2.5 text-[13px] font-semibold"
-            onClick={() => onNavigate("cart")}
           >
             <Icon name="cart" /> Cart
-          </button>
+          </ScreenLink>
         </nav>
       </header>
 
@@ -65,12 +70,14 @@ export function HomePage({ screen, onNavigate, onSelectRice, cartCount }: HomePa
               </small>
             </div>
           </div>
-          <button
+          <ScreenLink
+            to="menu"
+            onNavigate={onNavigate}
             className="grid h-[38px] w-[38px] place-items-center text-white"
             aria-label="Menu"
           >
             <Icon name="menu" />
-          </button>
+          </ScreenLink>
         </header>
         <div className="absolute left-0 top-[clamp(105px,14svh,120px)] z-10 h-auto w-full px-[clamp(16px,6.4vw,25px)] py-2.5 text-white min-[700px]:top-0 min-[700px]:h-full min-[700px]:w-[60%] min-[700px]:px-[5.2%] min-[700px]:pt-[clamp(54px,6vw,82px)]">
           <p className="mb-[9px] text-[clamp(15px,5.2vw,22px)] font-bold italic text-[#ff9200] min-[700px]:mb-[18px] min-[700px]:text-[clamp(19px,1.8vw,25px)]">
@@ -86,12 +93,13 @@ export function HomePage({ screen, onNavigate, onSelectRice, cartCount }: HomePa
             <br />
             made with love
           </span>
-          <button
-            className="mt-[15px] h-[43px] rounded-[15px] bg-[linear-gradient(105deg,#ff9700,#f05a05)] px-[17px] text-xs font-extrabold text-white shadow-[0_4px_10px_rgba(219,74,0,0.22)] min-[700px]:mt-6 min-[700px]:h-12 min-[700px]:rounded-[7px] min-[700px]:px-5 min-[700px]:text-[13px]"
-            onClick={() => onNavigate("menu")}
+          <ScreenLink
+            to="menu"
+            onNavigate={onNavigate}
+            className="mt-[15px] inline-flex h-[43px] items-center rounded-[15px] bg-[linear-gradient(105deg,#ff9700,#f05a05)] px-[17px] text-xs font-extrabold text-white shadow-[0_4px_10px_rgba(219,74,0,0.22)] min-[700px]:mt-6 min-[700px]:h-12 min-[700px]:rounded-[7px] min-[700px]:px-5 min-[700px]:text-[13px]"
           >
             Order Now <b className="ml-3.5">→</b>
-          </button>
+          </ScreenLink>
         </div>
       </section>
 
@@ -108,12 +116,13 @@ export function HomePage({ screen, onNavigate, onSelectRice, cartCount }: HomePa
               Choose from our delicious rice packages
             </p>
           </div>
-          <button
+          <ScreenLink
+            to="menu"
+            onNavigate={onNavigate}
             className="hidden border-0 bg-transparent py-2.5 text-[13px] font-extrabold text-dmk-orange min-[700px]:block"
-            onClick={() => onNavigate("menu")}
           >
             View full menu <b>→</b>
-          </button>
+          </ScreenLink>
         </div>
         <div className="grid grid-cols-2 gap-[9px] min-[700px]:gap-5">
           {menuItems.map((item) => (
@@ -132,16 +141,15 @@ export function HomePage({ screen, onNavigate, onSelectRice, cartCount }: HomePa
               {/* <strong className="ml-[7px] block text-xs text-[#29211b] min-[700px]:text-xs">
                 From ₦{item.price.toLocaleString()}
               </strong> */}
-              <button
+              <ScreenLink
+                to="customize"
+                onNavigate={onNavigate}
+                onBeforeNavigate={() => onSelectRice(item.name)}
                 className="absolute bottom-2 right-[7px] grid h-[26px] w-[26px] place-items-center rounded-full bg-gradient-to-br from-[#ff9a08] to-[#f45b14] text-[17px] font-extrabold text-white min-[700px]:bottom-3.5 min-[700px]:right-3.5 min-[700px]:h-[34px] min-[700px]:w-[34px]"
                 aria-label={`Add ${item.name}`}
-                onClick={() => {
-                  onSelectRice(item.name);
-                  onNavigate("customize");
-                }}
               >
                 +
-              </button>
+              </ScreenLink>
             </article>
           ))}
         </div>
@@ -162,12 +170,13 @@ export function HomePage({ screen, onNavigate, onSelectRice, cartCount }: HomePa
             Bulk orders for 50+ plates
           </small>
         </div>
-        <button
+        <ScreenLink
+          to="menu"
+          onNavigate={onNavigate}
           className="hidden rounded-md bg-[#ef8c45] px-[18px] py-3 text-[11px] font-extrabold text-white min-[700px]:block"
-          onClick={() => onNavigate("menu")}
         >
           Plan your order <b className="ml-2">→</b>
-        </button>
+        </ScreenLink>
       </section>
 
       <section className="order-3 mx-2 grid min-h-[54px] flex-none grid-cols-3 gap-0.5 rounded-none bg-transparent px-[3px] py-0.5 min-[700px]:mx-auto min-[700px]:mb-[22px] min-[700px]:mt-[30px] min-[700px]:max-w-[1180px] min-[700px]:rounded-[14px] min-[700px]:border min-[700px]:border-[#eee5dd] min-[700px]:bg-[#fffaf6] min-[700px]:px-[26px] min-[700px]:py-[22px]">

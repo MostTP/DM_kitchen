@@ -4,12 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -k -n API,WEB -c yellow,cyan \"npm run server\" \"npm run dev:web\"",
+    "dev:web": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "server": "node server/index.js",
-    "dev:full": "concurrently -k -n API,WEB -c yellow,cyan \"npm run server\" \"npm run dev\"",
+    "dev:full": "npm run dev",
     "start": "npm run server"
   },
   "dependencies": {

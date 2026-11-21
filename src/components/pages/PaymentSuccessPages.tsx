@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Screen } from '../../types'
 import { Header } from '../Header'
+import { ScreenLink } from '../ScreenLink'
 import { primaryActionClass, screenClass } from '../../styles/classes'
 
 interface PaymentPageProps {
@@ -67,47 +68,46 @@ export function PaymentPage({ total, onNavigate, onPay }: PaymentPageProps) {
   )
 }
 
-const qrRows = [
-  '1111111001011',
-  '1000001011101',
-  '1011101010011',
-  '1011101001110',
-  '1011101010101',
-  '1000001011010',
-  '1111111010101',
-  '0000000010110',
-  '1101011110101',
-  '0110110011100',
-  '1011101011011',
-  '0010110100101',
-  '1101011101110',
-]
-
 export function SuccessPage({ orderId, onNavigate }: { orderId: string; onNavigate: (screen: Screen) => void }) {
+  const [copied, setCopied] = useState(false)
+  const [copyError, setCopyError] = useState('')
+
+  const copyOrderCode = async () => {
+    try {
+      await navigator.clipboard.writeText(orderId)
+      setCopied(true)
+      setCopyError('')
+    } catch {
+      setCopied(false)
+      setCopyError('Copy was unavailable. Select and copy the order code above.')
+    }
+  }
+
   return (
     <div className={`${screenClass} pb-2`}>
       <Header back={false} title="" rightAction="none" onNavigate={onNavigate} />
-      <div className="relative flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-[14px] pb-2 pt-[8px] text-center">
+      <div className="relative flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-4 pb-6 pt-5 text-center min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[620px] min-[700px]:justify-center">
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[100px] bg-[linear-gradient(0deg,rgba(255,235,214,.8),transparent)]" />
-        <div className="mb-[5px] grid h-[48px] w-[48px] place-items-center rounded-full bg-[#20b968] text-[29px] font-bold text-white shadow-[0_0_0_8px_#e8f7ed]">✓</div>
-        <h1 className="mb-[4px] mt-[5px] text-[20px] font-bold leading-[1.05]">Order Placed<br />Successfully!</h1>
-        <p className="mb-[3px] text-[8px]">Your Order ID is:</p>
-        <strong className="mb-[7px] flex items-center gap-2 rounded-full border border-[#f1d4c4] bg-[#fff0e8] px-[10px] py-[5px] text-[8px]">{orderId}<span aria-hidden="true">▢</span></strong>
-        <div className="grid h-[119px] w-[119px] grid-cols-[repeat(13,minmax(0,1fr))] grid-rows-[repeat(13,minmax(0,1fr))] gap-[2px] rounded-[5px] border border-[#eee5dd] bg-white p-[7px] shadow-[0_3px_14px_rgba(50,30,20,0.08)]">
-          {qrRows.flatMap((row, rowIndex) => [...row].map((cell, columnIndex) => (
-            <span key={`${rowIndex}-${columnIndex}`} className={cell === '1' ? 'bg-[#191715]' : 'bg-white'} />
-          )))}
-        </div>
-        <small className="mt-[5px] text-[7px] leading-tight text-[#6f6963]">Scan this QR code<br />at pickup or delivery</small>
-        <button
-          className="z-[1] mt-[9px] h-[35px] w-full max-w-[330px] rounded-full bg-[#ff6b12] text-[10px] font-bold text-white"
-          onClick={() => onNavigate('track')}
+        <div className="relative z-[1] mb-4 grid h-14 w-14 place-items-center rounded-full bg-[#20b968] text-3xl font-bold text-white shadow-[0_0_0_8px_#e8f7ed]">✓</div>
+        <h1 className="relative z-[1] text-2xl font-extrabold leading-tight min-[700px]:text-3xl">Order placed successfully!</h1>
+        <p className="relative z-[1] mt-2 text-sm text-[#6f6963]">Keep this code and show it to staff when your order is delivered.</p>
+        <section className="relative z-[1] mt-6 w-full rounded-2xl border border-[#f1d4c4] bg-white p-5 text-left shadow-[0_8px_25px_rgba(50,30,20,0.07)] min-[700px]:p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#a95625]">Your order code</p>
+          <strong className="mt-2 block break-all font-mono text-lg font-extrabold tracking-wide text-[#30231c] min-[700px]:text-xl">{orderId}</strong>
+          <button type="button" onClick={() => void copyOrderCode()} className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-[#fff0e7] px-5 text-sm font-bold text-[#a94817] transition hover:bg-[#ffe5d4]">
+            {copied ? 'Copied order code ✓' : 'Copy order code'}
+          </button>
+          {copyError && <p role="alert" className="mt-2 text-xs text-red-700">{copyError}</p>}
+        </section>
+        <p className="relative z-[1] mt-3 max-w-md text-xs leading-relaxed text-[#77706a]">The delivery team can use this code to find and verify your order. Never share your account password or payment details.</p>
+        <ScreenLink
+          to="track"
+          onNavigate={onNavigate}
+          className="z-[1] mt-5 inline-flex h-12 w-full max-w-[380px] items-center justify-center rounded-full bg-[#ff6b12] text-sm font-bold text-white"
         >
-          Track My Order <b className="ml-1">→</b>
-        </button>
-        <button className="z-[1] mt-[5px] h-[28px] w-full max-w-[330px] rounded-full border border-[#f3ddca] bg-[#fff8f1] text-[8px] font-semibold" onClick={() => onNavigate('home')}>⌂ Back to Home</button>
-        <div className="pointer-events-none absolute bottom-0 left-0 h-[68px] w-[65px] bg-[url('https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=240&q=70')] bg-cover bg-center opacity-90" />
-        <div className="pointer-events-none absolute bottom-0 right-0 h-[68px] w-[65px] bg-[url('https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=240&q=70')] bg-cover bg-center opacity-90" />
+          Track my order <b className="ml-2">→</b>
+        </ScreenLink>
+        <ScreenLink to="home" onNavigate={onNavigate} className="z-[1] mt-2 inline-flex h-11 w-full max-w-[380px] items-center justify-center rounded-full border border-[#f3ddca] bg-[#fff8f1] text-sm font-semibold">⌂ Back to home</ScreenLink>
       </div>
     </div>
   )

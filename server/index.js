@@ -50,6 +50,7 @@ async function sendConfirmation(order) {
 async function saveOrder(order) {
   const { error } = await supabase.from('orders').insert({
     order_id: order.orderId,
+    user_id: order.userId,
     customer: order.customer,
     items: order.items,
     subtotal: order.subtotal,
@@ -59,6 +60,84 @@ async function saveOrder(order) {
     paystack_reference: order.reference,
   })
   if (error) throw error
+}
+
+function requireUser(request, response, next) {
+  const authorization = request.get('authorization') || ''
+  const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : ''
+  if (!supabase || !token) {
+    return response.status(supabase ? 401 : 503).json({
+      error: supabase ? 'Sign in to continue' : 'Supabase is not configured',
+    })
+  }
+
+  supabase.auth.getUser(token).then(({ data, error }) => {
+    if (error || !data.user) {
+      return response.status(401).json({ error: 'Your session has expired. Sign in again.' })
+    }
+    request.user = data.user
+    return next()
+  }).catch((error) => {
+    console.error('Unable to verify user session:', error)
+    return response.status(500).json({ error: 'Unable to verify user session' })
+  })
+}
+
+function isAdmin(user) {
+  const approvedEmails = (process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean)
+  return Boolean(user.email && approvedEmails.includes(user.email.toLowerCase()))
+}
+
+function requireAdmin(request, response, next) {
+  if (!isAdmin(request.user)) return response.sendStatus(403)
+  return next()
+}
+
+function createDeliveryVerificationToken(orderId, userId) {
+  const expiresAt = Date.now() + 10 * 60 * 1000
+  const payload = Buffer.from(JSON.stringify({ orderId, userId, expiresAt })).toString('base64url')
+  const signature = crypto
+    .createHmac('sha256', process.env.SUPABASE_SERVICE_ROLE_KEY)
+    .update(payload)
+    .digest('base64url')
+  return `${payload}.${signature}`
+}
+
+function isValidDeliveryVerificationToken(token, orderId, userId) {
+  if (typeof token !== 'string' || !process.env.SUPABASE_SERVICE_ROLE_KEY) return false
+  const [payload, signature, ...rest] = token.split('.')
+  if (!payload || !signature || rest.length) return false
+
+  const expected = crypto
+    .createHmac('sha256', process.env.SUPABASE_SERVICE_ROLE_KEY)
+    .update(payload)
+    .digest()
+  const received = Buffer.from(signature, 'base64url')
+  if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) return false
+
+  try {
+    const data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'))
+    return data.orderId === orderId && data.userId === userId && data.expiresAt > Date.now()
+  } catch {
+    return false
+  }
+}
+
+function mapOrder(data) {
+  return {
+    orderId: data.order_id,
+    customer: data.customer,
+    items: data.items,
+    subtotal: data.subtotal,
+    deliveryFee: data.delivery_fee,
+    total: data.total,
+    paymentStatus: data.payment_status,
+    status: data.status,
+    createdAt: data.created_at,
+  }
 }
 
 async function ordersTableReady() {
@@ -179,7 +258,7 @@ app.post(
 
 app.use(express.json({ limit: '1mb' }))
 
-app.post('/api/payments/initialize', async (request, response) => {
+app.post('/api/payments/initialize', requireUser, async (request, response) => {
   if (!process.env.PAYSTACK_SECRET_KEY) {
     return response.status(503).json({ error: 'Paystack is not configured' })
   }
@@ -198,7 +277,7 @@ app.post('/api/payments/initialize', async (request, response) => {
   const order = request.body
   const total = Number(order?.total)
   if (
-    !order?.customer?.email ||
+    !request.user.email ||
     !Number.isFinite(total) ||
     total <= 0 ||
     !Number.isSafeInteger(Math.round(total * 100))
@@ -213,7 +292,7 @@ app.post('/api/payments/initialize', async (request, response) => {
       {
         method: 'POST',
         body: JSON.stringify({
-          email: order.customer.email,
+          email: request.user.email,
           amount: Math.round(total * 100),
           reference: orderId,
           currency: 'NGN',
@@ -230,6 +309,11 @@ app.post('/api/payments/initialize', async (request, response) => {
     const storedOrder = {
       ...order,
       orderId,
+      userId: request.user.id,
+      customer: {
+        ...order.customer,
+        email: request.user.email,
+      },
       total,
       reference: paystack.data.reference,
       paymentStatus: 'pending',
@@ -247,7 +331,7 @@ app.post('/api/payments/initialize', async (request, response) => {
   }
 })
 
-app.get('/api/payments/verify/:reference', async (request, response) => {
+app.get('/api/payments/verify/:reference', requireUser, async (request, response) => {
   if (!process.env.PAYSTACK_SECRET_KEY) {
     return response.status(503).json({ error: 'Paystack is not configured' })
   }
@@ -259,6 +343,15 @@ app.get('/api/payments/verify/:reference', async (request, response) => {
     if (!(await ordersTableReady())) {
       return response.status(503).json({ error: 'Supabase orders table is not ready' })
     }
+    const { data: ownedOrder, error: ownerError } = await supabase
+      .from('orders')
+      .select('order_id')
+      .eq('paystack_reference', request.params.reference)
+      .eq('user_id', request.user.id)
+      .maybeSingle()
+    if (ownerError) throw ownerError
+    if (!ownedOrder) return response.status(404).json({ error: 'Order not found' })
+
     const { response: paystackResponse, result: paystack } = await getPaystackResponse(
       `/transaction/verify/${encodeURIComponent(request.params.reference)}`,
     )
@@ -279,7 +372,7 @@ app.get('/api/payments/verify/:reference', async (request, response) => {
   }
 })
 
-app.get('/api/orders/:orderId', async (request, response) => {
+app.get('/api/account/orders', requireUser, async (request, response) => {
   if (!supabase) return response.status(503).json({ error: 'Supabase is not configured' })
 
   try {
@@ -288,22 +381,120 @@ app.get('/api/orders/:orderId', async (request, response) => {
     }
     const { data, error } = await supabase
       .from('orders')
-      .select('order_id, status, payment_status, total, created_at')
-      .eq('order_id', request.params.orderId)
+      .select('order_id, customer, items, subtotal, delivery_fee, total, status, payment_status, created_at')
+      .eq('user_id', request.user.id)
+      .order('created_at', { ascending: false })
+    if (error) throw error
+
+    return response.json({ orders: data.map(mapOrder), isAdmin: isAdmin(request.user) })
+  } catch (error) {
+    console.error('Unable to retrieve customer orders:', error)
+    return response.status(500).json({ error: 'Unable to retrieve your orders' })
+  }
+})
+
+const orderStatuses = new Set([
+  'new',
+  'preparing',
+  'ready',
+  'out_for_delivery',
+  'completed',
+  'cancelled',
+])
+
+app.post('/api/admin/orders/verify', requireUser, requireAdmin, async (request, response) => {
+  const orderId = typeof request.body?.orderId === 'string'
+    ? request.body.orderId.trim().toUpperCase()
+    : ''
+  if (!orderId || orderId.length > 100) {
+    return response.status(400).json({ error: 'Enter the order code provided by the customer' })
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('order_id, customer, items, subtotal, delivery_fee, total, status, payment_status, created_at')
+      .eq('order_id', orderId)
+      .maybeSingle()
+    if (error) throw error
+    if (!data) return response.status(404).json({ error: 'No order matches that code' })
+
+    const canDeliver = data.payment_status === 'paid'
+    return response.json({
+      order: mapOrder(data),
+      canDeliver,
+      verificationToken: canDeliver
+        ? createDeliveryVerificationToken(data.order_id, request.user.id)
+        : null,
+    })
+  } catch (error) {
+    console.error('Unable to verify delivery order:', error)
+    return response.status(500).json({ error: 'Unable to verify this order' })
+  }
+})
+
+app.get('/api/admin/orders', requireUser, requireAdmin, async (_request, response) => {
+  try {
+    if (!(await ordersTableReady())) {
+      return response.status(503).json({ error: 'Supabase orders table is not ready' })
+    }
+    const { data, error } = await supabase
+      .from('orders')
+      .select('order_id, customer, items, subtotal, delivery_fee, total, status, payment_status, created_at')
+      .order('created_at', { ascending: false })
+      .limit(200)
+    if (error) throw error
+    return response.json({ orders: data.map(mapOrder) })
+  } catch (error) {
+    console.error('Unable to retrieve admin orders:', error)
+    return response.status(500).json({ error: 'Unable to retrieve orders' })
+  }
+})
+
+app.patch('/api/admin/orders/:orderId/status', requireUser, requireAdmin, async (request, response) => {
+  const status = request.body?.status
+  if (!orderStatuses.has(status)) {
+    return response.status(400).json({ error: 'Choose a valid order status' })
+  }
+
+  try {
+    const orderId = request.params.orderId.trim().toUpperCase()
+    if (status === 'out_for_delivery' && !isValidDeliveryVerificationToken(
+      request.body?.verificationToken,
+      orderId,
+      request.user.id,
+    )) {
+      return response.status(403).json({ error: 'Verify the customer order code before sending it out for delivery' })
+    }
+
+    const { data: current, error: currentError } = await supabase
+      .from('orders')
+      .select('order_id, payment_status, status')
+      .eq('order_id', orderId)
+      .maybeSingle()
+    if (currentError) throw currentError
+    if (!current) return response.status(404).json({ error: 'Order not found' })
+    if (['preparing', 'ready', 'out_for_delivery', 'completed'].includes(status) && current.payment_status !== 'paid') {
+      return response.status(409).json({ error: 'Payment must be confirmed before fulfilling this order' })
+    }
+    if (status === 'completed' && current.status !== 'out_for_delivery') {
+      return response.status(409).json({ error: 'An order must be out for delivery before it can be completed' })
+    }
+
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('order_id', orderId)
+      .eq('payment_status', current.payment_status)
+      .eq('status', current.status)
+      .select('order_id, customer, items, subtotal, delivery_fee, total, status, payment_status, created_at')
       .maybeSingle()
     if (error) throw error
     if (!data) return response.status(404).json({ error: 'Order not found' })
-
-    return response.json({
-      orderId: data.order_id,
-      status: data.status,
-      paymentStatus: data.payment_status,
-      total: data.total,
-      createdAt: data.created_at,
-    })
+    return response.json({ order: mapOrder(data) })
   } catch (error) {
-    console.error('Unable to retrieve order:', error)
-    return response.status(500).json({ error: 'Unable to retrieve order' })
+    console.error('Unable to update order status:', error)
+    return response.status(500).json({ error: 'Unable to update order status' })
   }
 })
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { CartItem as OrderCartItem, CustomerDetails, Screen } from '../../types'
 import { Header } from '../Header'
 import { Icon } from '../Icon'
+import { ScreenLink } from '../ScreenLink'
 import { QuantityControl } from '../QuantityControl'
 import { pageContentClass, primaryActionClass, screenClass } from '../../styles/classes'
 
@@ -33,7 +34,7 @@ export function CartPage({ items, deliveryFee, onNavigate, onItemQuantityChange 
         ) : (
           <div className="rounded-xl border border-[#eee5dd] bg-white p-6 text-center">
             <p className="text-base font-semibold">Your cart is empty</p>
-            <button type="button" className="mt-3 text-sm font-bold text-[#e9550b]" onClick={() => onNavigate('menu')}>Browse the menu</button>
+            <ScreenLink to="menu" onNavigate={onNavigate} className="mt-3 inline-flex min-h-10 items-center text-sm font-bold text-[#e9550b]">Browse the menu</ScreenLink>
           </div>
         )}
         <div className="mt-4 rounded-xl border border-[#eee5dd] bg-[#fffaf6] px-4 py-3">
@@ -42,9 +43,11 @@ export function CartPage({ items, deliveryFee, onNavigate, onItemQuantityChange 
           <div className="mt-2 flex justify-between border-t border-[#eee2d8] pt-3 text-base font-bold"><span>Total</span><b className="text-[#ff6417]">{currency(subtotal + deliveryFee)}</b></div>
         </div>
       </div>
-      <button className={`${primaryActionClass} disabled:cursor-not-allowed disabled:opacity-50`} onClick={() => onNavigate('checkout')} disabled={items.length === 0}>
-        Proceed to Checkout <b className="ml-1">→</b>
-      </button>
+      {items.length > 0 && (
+        <ScreenLink to="checkout" onNavigate={onNavigate} className={primaryActionClass}>
+          Proceed to Checkout <b className="ml-1">→</b>
+        </ScreenLink>
+      )}
     </div>
   )
 }
@@ -105,9 +108,9 @@ export function CheckoutPage({ customer, onCustomerChange, onNavigate }: Checkou
           />
         </label>
       </form>
-      <button className={primaryActionClass} onClick={() => onNavigate('payment')}>
+      <ScreenLink to="payment" onNavigate={onNavigate} className={primaryActionClass}>
         Continue to Payment <b className="ml-1">→</b>
-      </button>
+      </ScreenLink>
     </div>
   )
 }

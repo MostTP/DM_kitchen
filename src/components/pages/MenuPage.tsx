@@ -1,6 +1,7 @@
 import { menuItems } from '../../data/menu'
 import type { RiceType, Screen } from '../../types'
 import { Header } from '../Header'
+import { ScreenLink } from '../ScreenLink'
 import { pageContentClass, screenClass } from '../../styles/classes'
 
 interface MenuPageProps {
@@ -10,11 +11,6 @@ interface MenuPageProps {
 }
 
 export function MenuPage({ onNavigate, onSelectRice, cartCount }: MenuPageProps) {
-  const chooseRice = (rice: RiceType) => {
-    onSelectRice(rice)
-    onNavigate('customize')
-  }
-
   return (
     <div className={`${screenClass} pb-0`}>
       <Header title="Our Menu" rightAction="cart" cartCount={cartCount} onNavigate={onNavigate} />
@@ -35,14 +31,15 @@ export function MenuPage({ onNavigate, onSelectRice, cartCount }: MenuPageProps)
                 <p className="mb-1 text-sm leading-snug text-[#77706a] min-[700px]:text-xs">{item.description}</p>
                 {/* <strong className="text-sm">From ₦{item.price.toLocaleString()}</strong> */}
               </div>
-              <button
-                type="button"
+              <ScreenLink
+                to="customize"
+                onNavigate={onNavigate}
+                onBeforeNavigate={() => onSelectRice(item.name)}
                 className="absolute bottom-4 right-3 grid h-10 w-10 place-items-center rounded-full bg-[#ff711a] text-2xl font-medium leading-none text-white"
                 aria-label={`Customize ${item.name}`}
-                onClick={() => chooseRice(item.name)}
               >
                 +
-              </button>
+              </ScreenLink>
             </article>
           ))}
         </section>

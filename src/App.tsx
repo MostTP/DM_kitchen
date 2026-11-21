@@ -1,4 +1,8 @@
 import { useEffect, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
+import { AccountPage } from "./components/pages/AccountPage";
+import { AdminPage } from "./components/pages/AdminPage";
+import { AdminLoginPage } from "./components/pages/AdminLoginPage";
 import { CartPage, CheckoutPage } from "./components/pages/CartCheckoutPages";
 import { CustomizePage } from "./components/pages/CustomizePage";
 import { HomePage } from "./components/pages/HomePage";
@@ -7,13 +11,16 @@ import {
   PaymentPage,
   SuccessPage,
 } from "./components/pages/PaymentSuccessPages";
-import { TrackPage } from "./components/pages/TrackPage";
 import { buildCartItems, drinkItems, extraItems } from "./data/menu";
+import { supabase } from "./lib/supabase";
+import { getScreenFromPath, screenPaths } from "./lib/routes";
 import {
+  getAccountOrders,
   initializeOrder,
   createLocalDemoOrder,
   verifyOrder,
 } from "./services/orders";
+import type { AccountOrder } from "./services/orders";
 import type {
   CustomerDetails,
   DrinkId,
@@ -28,7 +35,17 @@ import type {
 const DELIVERY_FEE = 1000;
 
 function App() {
-  const [screen, setScreen] = useState<Screen>("home");
+  const [screen, setScreen] = useState<Screen>(() => getScreenFromPath(window.location.pathname));
+  const [session, setSession] = useState<Session | null>(null);
+  const [authReady, setAuthReady] = useState(!supabase);
+  const [accountResult, setAccountResult] = useState<{
+    accessToken: string;
+    refreshKey: number;
+    orders: AccountOrder[];
+    isAdmin: boolean;
+    error: string;
+  } | null>(null);
+  const [refreshAccount, setRefreshAccount] = useState(0);
   const [rice, setRice] = useState<RiceType>("Jollof Rice");
   const [plate, setPlate] = useState<PlateSize>("Medium");
   const [proteinQuantities, setProteinQuantities] = useState<Record<Protein, number>>({
@@ -42,37 +59,127 @@ function App() {
   const [drinkQuantities, setDrinkQuantities] = useState<Record<DrinkId, number>>({
     pepsi: 0,
   });
-  const [orderId, setOrderId] = useState("DMK-20251120-0042");
+  const [orderId, setOrderId] = useState("");
   const [customer, setCustomer] = useState<CustomerDetails>({
-    fullName: "Stephen Obiuwu",
-    phone: "08012345678",
-    email: "stephen@example.com",
-    address: "123 Main Street, Abuja",
-    deliveryDate: "Nov 20, 2025 · 12:00 PM",
+    fullName: "",
+    phone: "",
+    email: "",
+    address: "",
+    deliveryDate: "",
     specialInstructions: "",
   });
+  const activeScreen =
+    !session && (screen === "checkout" || screen === "payment") ? "track" : screen;
+
+  useEffect(() => {
+    const handlePopState = () => setScreen(getScreenFromPath(window.location.pathname));
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
+    let active = true;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      setSession(nextSession);
+      setAuthReady(true);
+      if (event === "SIGNED_IN") {
+        const destination = sessionStorage.getItem("dmk-after-sign-in");
+        sessionStorage.removeItem("dmk-after-sign-in");
+        if (destination === "checkout" || destination === "track") {
+          window.history.pushState({}, "", screenPaths[destination]);
+          setScreen(destination);
+        }
+      }
+    });
+    supabase.auth.getSession().then(({ data }) => {
+      if (active) {
+        setSession(data.session);
+        setAuthReady(true);
+      }
+    });
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!authReady || session || (screen !== "checkout" && screen !== "payment")) return;
+    sessionStorage.setItem("dmk-after-sign-in", "checkout");
+    if (window.location.pathname !== screenPaths.track) {
+      window.history.replaceState({}, "", screenPaths.track);
+    }
+  }, [authReady, screen, session]);
+
+  useEffect(() => {
+    if (!session) return;
+    let active = true;
+    const refreshKey = refreshAccount;
+    getAccountOrders(session.access_token)
+      .then((result) => {
+        if (active) setAccountResult({ ...result, accessToken: session.access_token, refreshKey, error: "" });
+      })
+      .catch((error: unknown) => {
+        if (active) {
+          setAccountResult({
+            accessToken: session.access_token,
+            refreshKey,
+            orders: [],
+            isAdmin: false,
+            error: error instanceof Error ? error.message : "Unable to load your orders.",
+          });
+        }
+      });
+    return () => { active = false; };
+  }, [session, refreshAccount]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const reference = params.get("reference") || params.get("trxref");
-    if (!reference) return;
+    if (!reference || !session) return;
 
-    verifyOrder(reference)
+    verifyOrder(reference, session.access_token)
       .then((order) => {
         setOrderId(order.orderId);
+        setRefreshAccount((current) => current + 1);
         setScreen("success");
       })
       .catch(() => setScreen("payment"));
-  }, []);
+  }, [session]);
 
   const cartItems = buildCartItems(rice, plate, proteinQuantities, extraQuantities, drinkQuantities);
   const subtotal = cartItems.reduce((total, item) => total + item.quantity * item.unitPrice, 0);
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   const orderTotal = subtotal + DELIVERY_FEE;
 
+  const navigate = (nextScreen: Screen) => {
+    if ((nextScreen === "checkout" || nextScreen === "payment") && !session) {
+      sessionStorage.setItem("dmk-after-sign-in", "checkout");
+      if (window.location.pathname !== screenPaths.track) {
+        window.history.pushState({}, "", screenPaths.track);
+      }
+      setScreen("track");
+      return;
+    }
+    if (nextScreen === "checkout" && session) {
+      setCustomer((current) => ({
+        ...current,
+        email: session.user.email ?? current.email,
+        fullName: current.fullName || String(session.user.user_metadata.full_name ?? ""),
+      }));
+    }
+    if (window.location.pathname !== screenPaths[nextScreen]) {
+      window.history.pushState({}, "", screenPaths[nextScreen]);
+    }
+    setScreen(nextScreen);
+  };
+
   const handlePay = async () => {
-    const demoOrder = await createLocalDemoOrder(customer, cartItems, DELIVERY_FEE);
-    const result = await initializeOrder(demoOrder);
+    if (!session) throw new Error("Sign in to your account before placing an order.");
+    const orderCustomer = { ...customer, email: session.user.email ?? customer.email };
+    const demoOrder = await createLocalDemoOrder(orderCustomer, cartItems, DELIVERY_FEE);
+    const result = await initializeOrder(demoOrder, session.access_token);
     setOrderId(result.orderId);
     window.location.assign(result.authorizationUrl);
   };
@@ -81,29 +188,29 @@ function App() {
     <main
       className="min-h-screen bg-[#fff6ec] font-sans text-[#2a201b] min-[700px]:bg-[#fffdfa]"
     >
-      {screen === "home" && (
+      {activeScreen === "home" && (
         <HomePage
-          screen={screen}
-          onNavigate={setScreen}
+          screen={activeScreen}
+          onNavigate={navigate}
           onSelectRice={setRice}
           cartCount={cartCount}
         />
       )}
-      {screen === "menu" && (
+      {activeScreen === "menu" && (
         <MenuPage
-          onNavigate={setScreen}
+          onNavigate={navigate}
           onSelectRice={setRice}
           cartCount={cartCount}
         />
       )}
-      {screen === "customize" && (
+      {activeScreen === "customize" && (
         <CustomizePage
           rice={rice}
           plate={plate}
           proteinQuantities={proteinQuantities}
           extraQuantities={extraQuantities}
           drinkQuantities={drinkQuantities}
-          onNavigate={setScreen}
+          onNavigate={navigate}
           onPlateChange={setPlate}
           onProteinQuantityChange={(protein, quantity) =>
             setProteinQuantities((current) => ({ ...current, [protein]: quantity }))
@@ -117,11 +224,11 @@ function App() {
           cartCount={cartCount}
         />
       )}
-      {screen === "cart" && (
+      {activeScreen === "cart" && (
         <CartPage
           items={cartItems}
           deliveryFee={DELIVERY_FEE}
-          onNavigate={setScreen}
+          onNavigate={navigate}
           onItemQuantityChange={(item: CartItem, quantity: number) => {
             if (item.id === "rice-chicken" || item.id === "rice-beef") {
               const protein = item.id === "rice-chicken" ? "Chicken" : "Beef";
@@ -138,21 +245,40 @@ function App() {
           }}
         />
       )}
-      {screen === "checkout" && (
+      {activeScreen === "checkout" && (
         <CheckoutPage
           customer={customer}
           onCustomerChange={setCustomer}
-          onNavigate={setScreen}
+          onNavigate={navigate}
         />
       )}
-      {screen === "payment" && (
-        <PaymentPage total={orderTotal} onNavigate={setScreen} onPay={handlePay} />
+      {activeScreen === "payment" && (
+        <PaymentPage total={orderTotal} onNavigate={navigate} onPay={handlePay} />
       )}
-      {screen === "success" && (
-        <SuccessPage orderId={orderId} onNavigate={setScreen} />
+      {activeScreen === "success" && (
+        <SuccessPage orderId={orderId} onNavigate={navigate} />
       )}
-      {screen === "track" && (
-        <TrackPage screen={screen} onNavigate={setScreen} cartCount={cartCount} />
+      {activeScreen === "track" && (
+        <AccountPage
+          session={session}
+          orders={accountResult?.accessToken === session?.access_token ? accountResult?.orders ?? [] : []}
+          isAdmin={accountResult?.accessToken === session?.access_token && Boolean(accountResult?.isAdmin)}
+          loadingOrders={Boolean(
+            session &&
+            (accountResult?.accessToken !== session.access_token ||
+              accountResult.refreshKey !== refreshAccount),
+          )}
+          accountError={accountResult?.accessToken === session?.access_token ? accountResult?.error ?? "" : ""}
+          onNavigate={navigate}
+          onRefresh={() => setRefreshAccount((current) => current + 1)}
+          cartCount={cartCount}
+        />
+      )}
+      {activeScreen === "admin" && (
+        <AdminPage session={session} onNavigate={navigate} />
+      )}
+      {activeScreen === "admin-login" && (
+        <AdminLoginPage onNavigate={navigate} />
       )}
     </main>
   );

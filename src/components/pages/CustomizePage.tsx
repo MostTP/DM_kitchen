@@ -2,6 +2,7 @@ import { drinkItems, extraItems, foodImages } from '../../data/menu'
 import type { DrinkId, ExtraId, PlateSize, Protein, RiceType, Screen } from '../../types'
 import { pageContentClass, primaryActionClass, screenClass } from '../../styles/classes'
 import { Header } from '../Header'
+import { ScreenLink } from '../ScreenLink'
 import { QuantityControl } from '../QuantityControl'
 
 interface CustomizePageProps {
@@ -34,9 +35,9 @@ export function CustomizePage(props: CustomizePageProps) {
             <p className="text-xs text-[#77706a]">Your meal</p>
             <h2 className="text-base font-bold">{rice}</h2>
           </div>
-          <button type="button" className="min-h-10 px-2 text-sm font-semibold text-[#e9550b]" onClick={() => props.onNavigate('menu')}>
+          <ScreenLink to="menu" onNavigate={props.onNavigate} className="inline-flex min-h-10 items-center px-2 text-sm font-semibold text-[#e9550b]">
             Change
-          </button>
+          </ScreenLink>
         </div>
         <section className="mb-4">
           <h3 className="mb-2 text-base font-bold">Select Plate Size</h3>
@@ -99,9 +100,9 @@ export function CustomizePage(props: CustomizePageProps) {
           </div>
         </section>
       </div>
-      <button className={`${primaryActionClass} shadow-[0_3px_8px_rgba(217,93,42,0.2)]`} onClick={() => props.onNavigate('cart')}>
+      <ScreenLink to="cart" onNavigate={props.onNavigate} className={`${primaryActionClass} shadow-[0_3px_8px_rgba(217,93,42,0.2)]`}>
         Add to Cart <b className="ml-2">→</b>
-      </button>
+      </ScreenLink>
     </div>
   )
 }

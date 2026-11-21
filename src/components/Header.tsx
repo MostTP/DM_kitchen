@@ -1,10 +1,12 @@
 import type { Screen } from '../types'
 import { desktopNavButtonClass, desktopNavClass, headerClass, iconButtonClass, screenTitleClass } from '../styles/classes'
 import { Icon } from './Icon'
+import { ScreenLink } from './ScreenLink'
 
 interface HeaderProps {
   title?: string
   back?: boolean
+  backTarget?: Screen
   rightAction?: 'cart' | 'trash' | 'search' | 'none'
   cartCount?: number
   onNavigate: (screen: Screen) => void
@@ -13,25 +15,23 @@ interface HeaderProps {
 export function Header({
   title,
   back = true,
+  backTarget = 'home',
   rightAction = 'search',
   cartCount = 0,
   onNavigate,
 }: HeaderProps) {
   return (
     <header className={headerClass}>
-      <div className="flex h-[22px] items-center justify-between px-[14px] text-[9px] font-bold text-[#1d1b19] min-[700px]:hidden">
-        <span>9:41</span>
-        <span className="tracking-[1px]">▮▮▮ ▴ ▰</span>
-      </div>
       <div className="grid h-[40px] grid-cols-[36px_1fr_36px] items-center px-[10px] min-[700px]:flex min-[700px]:h-full min-[700px]:px-0">
         {back ? (
-          <button
+          <ScreenLink
+            to={backTarget}
+            onNavigate={onNavigate}
             className={iconButtonClass}
-            onClick={() => onNavigate('home')}
             aria-label="Go back"
           >
             <Icon name="back" size={18} />
-          </button>
+          </ScreenLink>
         ) : title ? (
           <div className="grid h-[30px] w-[30px] place-items-center rounded-full bg-dmk-orange font-serif font-black text-white min-[700px]:hidden">
             D<span className="-ml-1 mt-[5px] self-start text-[9px]">✦</span>
@@ -41,9 +41,10 @@ export function Header({
         )}
         {title && <h2 className={screenTitleClass}>{title}</h2>}
         {rightAction !== 'none' ? (
-          <button
+          <ScreenLink
+            to="cart"
+            onNavigate={onNavigate}
             className={`${iconButtonClass} relative justify-self-end ${rightAction === 'trash' ? 'text-[#ff321f]' : ''}`}
-            onClick={() => rightAction === 'cart' && onNavigate('cart')}
             aria-label={
               rightAction === 'cart'
                 ? 'Open cart'
@@ -58,15 +59,15 @@ export function Header({
                 {cartCount}
               </span>
             )}
-          </button>
+          </ScreenLink>
         ) : (
           <span />
         )}
         <nav className={desktopNavClass} aria-label="Main navigation">
-          <button className={desktopNavButtonClass} onClick={() => onNavigate('home')}>Home</button>
-          <button className={desktopNavButtonClass} onClick={() => onNavigate('menu')}>Our Menu</button>
-          <button className={desktopNavButtonClass} onClick={() => onNavigate('track')}>Track Order</button>
-          <button className="flex items-center gap-2 rounded-[7px] border border-[#e8ddd4] px-[15px] py-2.5 text-[13px] font-semibold" onClick={() => onNavigate('cart')}><Icon name="cart" /> Cart</button>
+          <ScreenLink to="home" onNavigate={onNavigate} className={desktopNavButtonClass}>Home</ScreenLink>
+          <ScreenLink to="menu" onNavigate={onNavigate} className={desktopNavButtonClass}>Our Menu</ScreenLink>
+          <ScreenLink to="track" onNavigate={onNavigate} className={desktopNavButtonClass}>My Account</ScreenLink>
+          <ScreenLink to="cart" onNavigate={onNavigate} className="flex items-center gap-2 rounded-[7px] border border-[#e8ddd4] px-[15px] py-2.5 text-[13px] font-semibold"><Icon name="cart" /> Cart</ScreenLink>
         </nav>
       </div>
     </header>

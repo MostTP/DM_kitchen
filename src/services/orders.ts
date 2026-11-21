@@ -5,6 +5,8 @@ export type AccountOrder = Pick<
   'orderId' | 'customer' | 'items' | 'subtotal' | 'deliveryFee' | 'total' | 'paymentStatus' | 'status' | 'createdAt'
 >
 
+const apiBaseUrl = import.meta.env.VITE_API_URL?.replace(/\/+$/, '')
+
 async function getError(response: Response, fallback: string) {
   const body = await response.json().catch(() => null)
   return new Error(typeof body?.error === 'string' ? body.error : fallback)
@@ -12,11 +14,18 @@ async function getError(response: Response, fallback: string) {
 
 async function fetchApi(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   try {
-    return await fetch(input, init)
+    const requestUrl =
+      apiBaseUrl && typeof input === 'string' && input.startsWith('/api/')
+        ? new URL(input, `${apiBaseUrl}/`)
+        : input
+    return await fetch(requestUrl, init)
   } catch (error) {
     if (error instanceof TypeError) {
+      const setupHint = apiBaseUrl
+        ? 'Check VITE_API_URL in the frontend deployment and confirm the API server is online.'
+        : 'Start the local API and web app with `npm run dev` and try again.'
       throw new Error(
-        'Could not connect to the order service. Start the app with `npm run dev` and try again.',
+        `Could not connect to the order service. ${setupHint}`,
         { cause: error },
       )
     }
@@ -46,7 +55,7 @@ export async function verifyOrder(reference: string, accessToken: string): Promi
   return response.json()
 }
 
-export async function getAccountOrders(accessToken: string): Promise<{ orders: AccountOrder[]; isAdmin: boolean }> {
+export async function getAccountOrders(accessToken: string): Promise<{ orders: AccountOrder[] }> {
   const response = await fetchApi('/api/account/orders', {
     headers: { Authorization: `Bearer ${accessToken}` },
   })

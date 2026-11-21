@@ -42,7 +42,6 @@ function App() {
     accessToken: string;
     refreshKey: number;
     orders: AccountOrder[];
-    isAdmin: boolean;
     error: string;
   } | null>(null);
   const [refreshAccount, setRefreshAccount] = useState(0);
@@ -87,7 +86,9 @@ function App() {
         const destination = sessionStorage.getItem("dmk-after-sign-in");
         sessionStorage.removeItem("dmk-after-sign-in");
         if (destination === "checkout" || destination === "track") {
-          window.history.pushState({}, "", screenPaths[destination]);
+          if (window.location.pathname !== screenPaths[destination]) {
+            window.history.pushState({}, "", screenPaths[destination]);
+          }
           setScreen(destination);
         }
       }
@@ -126,7 +127,6 @@ function App() {
             accessToken: session.access_token,
             refreshKey,
             orders: [],
-            isAdmin: false,
             error: error instanceof Error ? error.message : "Unable to load your orders.",
           });
         }
@@ -165,7 +165,6 @@ function App() {
     if (nextScreen === "checkout" && session) {
       setCustomer((current) => ({
         ...current,
-        email: session.user.email ?? current.email,
         fullName: current.fullName || String(session.user.user_metadata.full_name ?? ""),
       }));
     }
@@ -248,6 +247,7 @@ function App() {
       {activeScreen === "checkout" && (
         <CheckoutPage
           customer={customer}
+          receiptEmail={session?.user.email ?? ""}
           onCustomerChange={setCustomer}
           onNavigate={navigate}
         />
@@ -262,7 +262,6 @@ function App() {
         <AccountPage
           session={session}
           orders={accountResult?.accessToken === session?.access_token ? accountResult?.orders ?? [] : []}
-          isAdmin={accountResult?.accessToken === session?.access_token && Boolean(accountResult?.isAdmin)}
           loadingOrders={Boolean(
             session &&
             (accountResult?.accessToken !== session.access_token ||

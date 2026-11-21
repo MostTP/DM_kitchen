@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Screen } from '../../types'
 import { Header } from '../Header'
+import { Icon } from '../Icon'
 import { ScreenLink } from '../ScreenLink'
 import { primaryActionClass, screenClass } from '../../styles/classes'
 
@@ -10,15 +11,7 @@ interface PaymentPageProps {
   onPay: () => Promise<void>
 }
 
-const paymentMethods = [
-  { icon: '◉', label: 'Card Payment', brand: 'VISA  ●●' },
-  { icon: '▤', label: 'Bank Transfer', brand: '' },
-  { icon: '▯', label: 'USSD', brand: '' },
-  { icon: 'ϟ', label: 'Pay with Paystack', brand: '' },
-]
-
 export function PaymentPage({ total, onNavigate, onPay }: PaymentPageProps) {
-  const [selected, setSelected] = useState('Card Payment')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -41,28 +34,18 @@ export function PaymentPage({ total, onNavigate, onPay }: PaymentPageProps) {
         <span className="text-sm">Amount to Pay</span>
         <strong className="text-2xl leading-tight">₦{total.toLocaleString()}</strong>
       </div>
-      <h3 className="mx-4 mb-2 mt-4 text-base font-bold min-[700px]:mx-auto min-[700px]:mt-[22px] min-[700px]:max-w-[680px]">Choose Payment Method</h3>
-      <div className="space-y-2 px-4 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[680px]">
-        {paymentMethods.map((method) => {
-          const active = selected === method.label
-          return (
-            <button
-              key={method.label}
-              onClick={() => setSelected(method.label)}
-              className={`grid h-14 w-full grid-cols-[32px_1fr_auto] items-center rounded-xl border bg-white px-3 text-left ${active ? 'border-[#ff6b1a]' : 'border-[#eee5dd]'}`}
-            >
-              <span className={`grid h-6 w-6 place-items-center rounded-full text-sm ${active ? 'bg-[#ff701a] text-white' : 'bg-[#f5f0ec] text-[#81766f]'}`}>{active ? '✓' : method.icon}</span>
-              <strong className="text-sm">{method.label}</strong>
-              {method.brand && <span className="mr-1 text-xs font-black italic text-[#2353a3]">{method.brand}</span>}
-              {active && <span className="ml-1 grid h-5 w-5 place-items-center rounded-full bg-[#ff711a] text-xs text-white">✓</span>}
-            </button>
-          )
-        })}
-      </div>
-      <div className="mt-4 text-center text-xs text-[#716a64]"><span className="mr-1 text-[#ff941c]">♙</span>Your payment is secure and encrypted.</div>
+      <section className="mx-4 mt-5 flex items-start gap-3 rounded-xl border border-[#eee5dd] bg-white p-4 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[680px]">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#fff0e7] text-[#e9550b]">
+          <Icon name="lock" size={22} />
+        </span>
+        <div>
+          <h3 className="text-sm font-bold">Secure payment with Paystack</h3>
+          <p className="mt-1 text-sm leading-relaxed text-[#716a64]">Choose card, bank transfer, USSD, or another available option on the secure Paystack page.</p>
+        </div>
+      </section>
       {error && <p role="alert" className="mx-3 mt-2 text-center text-[10px] text-red-700">{error}</p>}
       <button className={primaryActionClass} onClick={() => void pay()} disabled={loading}>
-        {loading ? 'Connecting to Paystack…' : <>Pay Now <b className="ml-1">→</b></>}
+        {loading ? 'Connecting to Paystack…' : <>Continue to Paystack <b className="ml-2">→</b></>}
       </button>
     </div>
   )

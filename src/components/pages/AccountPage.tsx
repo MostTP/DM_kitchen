@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
+import { screenPaths } from '../../lib/routes'
 import type { Screen } from '../../types'
 import { supabase } from '../../lib/supabase'
 import type { AccountOrder } from '../../services/orders'
@@ -12,7 +13,6 @@ import { primaryActionClass, screenClass } from '../../styles/classes'
 interface AccountPageProps {
   session: Session | null
   orders: AccountOrder[]
-  isAdmin: boolean
   loadingOrders: boolean
   accountError: string
   onNavigate: (screen: Screen) => void
@@ -22,11 +22,20 @@ interface AccountPageProps {
 
 const money = (amount: number) => `₦${amount.toLocaleString()}`
 const prettyStatus = (status: string) => status.replaceAll('_', ' ')
+const oauthCallbackError = (() => {
+  const query = new URLSearchParams(window.location.search)
+  const fragment = new URLSearchParams(window.location.hash.slice(1))
+  const description =
+    query.get('error_description') ??
+    fragment.get('error_description') ??
+    query.get('error') ??
+    fragment.get('error')
+  return description ? `Google sign-in failed: ${description}` : ''
+})()
 
 export function AccountPage({
   session,
   orders,
-  isAdmin,
   loadingOrders,
   accountError,
   onNavigate,
@@ -37,7 +46,7 @@ export function AccountPage({
   const [code, setCode] = useState('')
   const [codeSent, setCodeSent] = useState(false)
   const [authMessage, setAuthMessage] = useState('')
-  const [authError, setAuthError] = useState('')
+  const [authError, setAuthError] = useState(oauthCallbackError)
   const [authLoading, setAuthLoading] = useState(false)
   const displayName = String(
     session?.user.user_metadata.full_name ??
@@ -93,7 +102,7 @@ export function AccountPage({
 
   const signInWithGoogle = async () => {
     if (!supabase) {
-      setAuthError('Sign-in is not configured yet.')
+      setAuthError('Google sign-in is not configured in this deployment. Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your hosting settings, then rebuild and redeploy.')
       return
     }
     setAuthLoading(true)
@@ -101,13 +110,18 @@ export function AccountPage({
     if (!sessionStorage.getItem('dmk-after-sign-in')) {
       sessionStorage.setItem('dmk-after-sign-in', 'track')
     }
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin },
-    })
-    if (error) {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: new URL(screenPaths.track, window.location.origin).toString() },
+      })
+      if (error) {
+        setAuthError(error.message)
+        setAuthLoading(false)
+      }
+    } catch (requestError) {
+      setAuthError(requestError instanceof Error ? requestError.message : 'Unable to start Google sign-in.')
       setAuthLoading(false)
-      setAuthError(error.message)
     }
   }
 
@@ -151,20 +165,6 @@ export function AccountPage({
                   <span className="text-xs text-white/65">In progress</span>
                 </div>
               </div>
-              {isAdmin && (
-                <div className="flex justify-end border-t border-white/10 px-5 py-3 min-[700px]:px-7">
-                  <ScreenLink to="admin" onNavigate={onNavigate} className="inline-flex min-h-10 items-center rounded-full bg-[#ff791c] px-4 text-sm font-bold text-white">
-                    Open admin dashboard →
-                  </ScreenLink>
-                </div>
-              )}
-              {!isAdmin && (
-                <div className="flex justify-end border-t border-white/10 px-5 py-3 min-[700px]:px-7">
-                  <ScreenLink to="admin-login" onNavigate={onNavigate} className="inline-flex min-h-10 items-center text-sm font-semibold text-white/80 underline underline-offset-4">
-                    Staff admin sign in
-                  </ScreenLink>
-                </div>
-              )}
             </section>
 
             <section className="mt-7">
@@ -286,9 +286,6 @@ export function AccountPage({
             >
               {authLoading ? 'Please wait…' : codeSent ? 'Verify code' : 'Email me a sign-in code'}
             </button>
-            <ScreenLink to="admin-login" onNavigate={onNavigate} className="mt-5 flex min-h-10 w-full items-center justify-center text-sm font-semibold text-[#8b4a20] underline underline-offset-4">
-              Staff admin sign in
-            </ScreenLink>
             </div>
           </section>
         )}

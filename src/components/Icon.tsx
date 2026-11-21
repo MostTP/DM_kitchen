@@ -10,6 +10,12 @@ const iconPaths: Record<string, ReactNode> = {
   trash: <><path d="M3 6h18M8 6V3h8v3M6 6l1 15h10l1-15M10 10v7M14 10v7"/></>,
   truck: <><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></>,
   bag: <><path d="M5 8h14l-1 13H6zM9 8V6a3 3 0 016 0v2"/></>,
+  person: <><circle cx="12" cy="8" r="3.5"/><path d="M5 21c.7-4.1 3.2-6 7-6s6.3 1.9 7 6"/></>,
+  phone: <><path d="M7 3h10v18H7z"/><path d="M10 6h4M11 18h2"/></>,
+  mail: <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></>,
+  pin: <><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1116 0z"/><circle cx="12" cy="10" r="2.5"/></>,
+  calendar: <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></>,
+  lock: <><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3M12 14v3"/></>,
 }
 
 export function Icon({ name, size = 20 }: { name: string; size?: number }) {

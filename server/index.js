@@ -10,12 +10,16 @@ dotenv.config()
 
 const app = express()
 const port = Number(process.env.PORT || 8787)
+const allowedOrigins = (process.env.APP_ORIGIN || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
 const supabase =
   process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
     ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
     : null
 
-app.use(cors({ origin: process.env.APP_ORIGIN || 'http://localhost:5173' }))
+app.use(cors({ origin: allowedOrigins }))
 
 function createTransporter() {
   if (!isEmailConfigured()) return null
@@ -386,7 +390,7 @@ app.get('/api/account/orders', requireUser, async (request, response) => {
       .order('created_at', { ascending: false })
     if (error) throw error
 
-    return response.json({ orders: data.map(mapOrder), isAdmin: isAdmin(request.user) })
+    return response.json({ orders: data.map(mapOrder) })
   } catch (error) {
     console.error('Unable to retrieve customer orders:', error)
     return response.status(500).json({ error: 'Unable to retrieve your orders' })

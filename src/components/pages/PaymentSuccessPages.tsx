@@ -4,6 +4,7 @@ import { Header } from '../Header'
 import { primaryActionClass, screenClass } from '../../styles/classes'
 
 interface PaymentPageProps {
+  total: number
   onNavigate: (screen: Screen) => void
   onPay: () => Promise<void>
 }
@@ -15,7 +16,7 @@ const paymentMethods = [
   { icon: 'ϟ', label: 'Pay with Paystack', brand: '' },
 ]
 
-export function PaymentPage({ onNavigate, onPay }: PaymentPageProps) {
+export function PaymentPage({ total, onNavigate, onPay }: PaymentPageProps) {
   const [selected, setSelected] = useState('Card Payment')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -35,29 +36,29 @@ export function PaymentPage({ onNavigate, onPay }: PaymentPageProps) {
   return (
     <div className={`${screenClass} pb-[60px]`}>
       <Header title="Payment" onNavigate={onNavigate} rightAction="none" />
-      <div className="mx-[10px] mt-[7px] flex h-[60px] flex-col items-center justify-center rounded-[10px] border border-[#eee5dd] bg-[#fffaf6] min-[700px]:mx-auto min-[700px]:mt-7 min-[700px]:h-[110px] min-[700px]:max-w-[1124px]">
-        <span className="text-[8px]">Amount to Pay</span>
-        <strong className="text-[20px] leading-tight">₦55,000</strong>
+      <div className="mx-4 mt-3 flex h-20 flex-col items-center justify-center rounded-xl border border-[#eee5dd] bg-[#fffaf6] min-[700px]:mx-auto min-[700px]:mt-7 min-[700px]:h-[110px] min-[700px]:max-w-[1124px]">
+        <span className="text-sm">Amount to Pay</span>
+        <strong className="text-2xl leading-tight">₦{total.toLocaleString()}</strong>
       </div>
-      <h3 className="mx-[10px] mb-[5px] mt-[9px] text-[10px] font-bold min-[700px]:mx-auto min-[700px]:mt-[22px] min-[700px]:max-w-[680px] min-[700px]:text-base">Choose Payment Method</h3>
-      <div className="space-y-[4px] px-[10px] min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[680px]">
+      <h3 className="mx-4 mb-2 mt-4 text-base font-bold min-[700px]:mx-auto min-[700px]:mt-[22px] min-[700px]:max-w-[680px]">Choose Payment Method</h3>
+      <div className="space-y-2 px-4 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[680px]">
         {paymentMethods.map((method) => {
           const active = selected === method.label
           return (
             <button
               key={method.label}
               onClick={() => setSelected(method.label)}
-              className={`grid h-[35px] w-full grid-cols-[25px_1fr_auto] items-center rounded-[8px] border bg-white px-[7px] text-left ${active ? 'border-[#ff6b1a]' : 'border-[#eee5dd]'}`}
+              className={`grid h-14 w-full grid-cols-[32px_1fr_auto] items-center rounded-xl border bg-white px-3 text-left ${active ? 'border-[#ff6b1a]' : 'border-[#eee5dd]'}`}
             >
-              <span className={`grid h-[17px] w-[17px] place-items-center rounded-full text-[10px] ${active ? 'bg-[#ff701a] text-white' : 'bg-[#f5f0ec] text-[#81766f]'}`}>{active ? '✓' : method.icon}</span>
-              <strong className="text-[9px]">{method.label}</strong>
-              {method.brand && <span className="mr-1 text-[9px] font-black italic text-[#2353a3]">{method.brand}</span>}
-              {active && <span className="ml-1 grid h-[13px] w-[13px] place-items-center rounded-full bg-[#ff711a] text-[8px] text-white">✓</span>}
+              <span className={`grid h-6 w-6 place-items-center rounded-full text-sm ${active ? 'bg-[#ff701a] text-white' : 'bg-[#f5f0ec] text-[#81766f]'}`}>{active ? '✓' : method.icon}</span>
+              <strong className="text-sm">{method.label}</strong>
+              {method.brand && <span className="mr-1 text-xs font-black italic text-[#2353a3]">{method.brand}</span>}
+              {active && <span className="ml-1 grid h-5 w-5 place-items-center rounded-full bg-[#ff711a] text-xs text-white">✓</span>}
             </button>
           )
         })}
       </div>
-      <div className="mt-[9px] text-center text-[7px] text-[#716a64]"><span className="mr-1 text-[#ff941c]">♙</span>Your payment is secure and encrypted.</div>
+      <div className="mt-4 text-center text-xs text-[#716a64]"><span className="mr-1 text-[#ff941c]">♙</span>Your payment is secure and encrypted.</div>
       {error && <p role="alert" className="mx-3 mt-2 text-center text-[10px] text-red-700">{error}</p>}
       <button className={primaryActionClass} onClick={() => void pay()} disabled={loading}>
         {loading ? 'Connecting to Paystack…' : <>Pay Now <b className="ml-1">→</b></>}

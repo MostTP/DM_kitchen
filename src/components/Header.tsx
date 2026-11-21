@@ -14,7 +14,7 @@ export function Header({
   title,
   back = true,
   rightAction = 'search',
-  cartCount = 2,
+  cartCount = 0,
   onNavigate,
 }: HeaderProps) {
   return (

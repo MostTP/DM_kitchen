@@ -1,4 +1,4 @@
-import type { CustomerDetails, Order } from '../types'
+import type { CartItem, CustomerDetails, Order } from '../types'
 
 export interface TrackedOrder {
   orderId: string
@@ -41,14 +41,19 @@ export async function trackOrder(orderId: string): Promise<TrackedOrder> {
   return response.json()
 }
 
-export async function createLocalDemoOrder(customer: CustomerDetails): Promise<Order> {
+export async function createLocalDemoOrder(
+  customer: CustomerDetails,
+  items: CartItem[],
+  deliveryFee: number,
+): Promise<Order> {
+  const subtotal = items.reduce((total, item) => total + item.quantity * item.unitPrice, 0)
   return {
     orderId: `DMK-${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-0042`,
     customer,
-    items: [],
-    subtotal: 54000,
-    deliveryFee: 1000,
-    total: 55000,
+    items,
+    subtotal,
+    deliveryFee,
+    total: subtotal + deliveryFee,
     paymentStatus: 'pending',
   }
 }

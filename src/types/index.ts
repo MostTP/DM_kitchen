@@ -11,6 +11,8 @@ export type Screen =
 export type RiceType = 'Jollof Rice' | 'Mixed Rice'
 export type PlateSize = 'Medium' | 'Big'
 export type Protein = 'Chicken' | 'Beef'
+export type ExtraId = 'extra-beef' | 'extra-chicken'
+export type DrinkId = 'pepsi'
 
 export interface CartItem {
   id: string

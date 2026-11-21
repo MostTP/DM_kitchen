@@ -1,74 +1,71 @@
 import { useState } from 'react'
-import type { CustomerDetails, Screen } from '../../types'
-import { foodImages } from '../../data/menu'
+import type { CartItem as OrderCartItem, CustomerDetails, Screen } from '../../types'
 import { Header } from '../Header'
 import { Icon } from '../Icon'
-import { pageContentClass, primaryActionClass, quantityControlClass, screenClass } from '../../styles/classes'
+import { QuantityControl } from '../QuantityControl'
+import { pageContentClass, primaryActionClass, screenClass } from '../../styles/classes'
 
 interface CartPageProps {
-  rice: string
-  plate: string
-  quantity: number
+  items: OrderCartItem[]
+  deliveryFee: number
   onNavigate: (screen: Screen) => void
+  onItemQuantityChange: (item: OrderCartItem, quantity: number) => void
 }
 
-export function CartPage({ rice, plate, quantity, onNavigate }: CartPageProps) {
-  const entries = [
-    { image: foodImages.jollof, name: rice, size: `${plate} Plate`, protein: `Chicken · ${quantity} plates`, price: '₦25,000' },
-    { image: foodImages.mixed, name: 'Mixed Rice', size: 'Medium Plate', protein: `Beef · ${quantity} plates`, price: '₦25,000' },
-  ]
+const currency = (amount: number) => `₦${amount.toLocaleString()}`
 
+export function CartPage({ items, deliveryFee, onNavigate, onItemQuantityChange }: CartPageProps) {
+  const subtotal = items.reduce((total, item) => total + item.quantity * item.unitPrice, 0)
   return (
     <div className={`${screenClass} pb-[60px]`}>
-      <Header title="Your Cart" rightAction="trash" onNavigate={onNavigate} />
-      <div className={`${pageContentClass} px-[10px] pt-[7px] min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[1124px] min-[700px]:px-7 min-[700px]:py-6`}>
-        <div className="space-y-[6px]">
-          {entries.map((item, index) => (
-            <CartItem key={`${item.name}-${index}`} {...item} />
-          ))}
-          <CartItem image="" name="Pepsi" size="10 units" protein="" price="₦4,000" drink />
-        </div>
-        <div className="mt-[7px] rounded-[9px] border border-[#eee5dd] bg-[#fffaf6] px-[9px] py-[6px]">
-          <div className="flex justify-between py-[3px] text-[9px]"><span>Subtotal</span><strong>₦54,000</strong></div>
-          <div className="flex justify-between py-[3px] text-[9px]"><span>Delivery Fee</span><strong>₦1,000</strong></div>
-          <div className="mt-[3px] flex justify-between border-t border-[#eee2d8] pt-[5px] text-[12px] font-bold"><span>Total</span><b className="text-[#ff6417]">₦55,000</b></div>
+      <Header title="Your Cart" rightAction="none" onNavigate={onNavigate} />
+      <div className={`${pageContentClass} px-4 pt-3 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[1124px] min-[700px]:px-7 min-[700px]:py-6`}>
+        {items.length > 0 ? (
+          <div className="space-y-3">
+            {items.map((item) => (
+              <CartItem
+                key={item.id}
+                item={item}
+                onQuantityChange={(quantity) => onItemQuantityChange(item, quantity)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-[#eee5dd] bg-white p-6 text-center">
+            <p className="text-base font-semibold">Your cart is empty</p>
+            <button type="button" className="mt-3 text-sm font-bold text-[#e9550b]" onClick={() => onNavigate('menu')}>Browse the menu</button>
+          </div>
+        )}
+        <div className="mt-4 rounded-xl border border-[#eee5dd] bg-[#fffaf6] px-4 py-3">
+          <div className="flex justify-between py-1 text-sm"><span>Subtotal</span><strong>{currency(subtotal)}</strong></div>
+          <div className="flex justify-between py-1 text-sm"><span>Delivery Fee</span><strong>{currency(deliveryFee)}</strong></div>
+          <div className="mt-2 flex justify-between border-t border-[#eee2d8] pt-3 text-base font-bold"><span>Total</span><b className="text-[#ff6417]">{currency(subtotal + deliveryFee)}</b></div>
         </div>
       </div>
-      <button className={primaryActionClass} onClick={() => onNavigate('checkout')}>
+      <button className={`${primaryActionClass} disabled:cursor-not-allowed disabled:opacity-50`} onClick={() => onNavigate('checkout')} disabled={items.length === 0}>
         Proceed to Checkout <b className="ml-1">→</b>
       </button>
     </div>
   )
 }
 
-interface CartItemProps {
-  image: string
-  name: string
-  size: string
-  protein: string
-  price: string
-  drink?: boolean
-}
-
-function CartItem({ image, name, size, protein, price, drink = false }: CartItemProps) {
+function CartItem({ item, onQuantityChange }: { item: OrderCartItem; onQuantityChange: (quantity: number) => void }) {
+  const isDrink = item.description === 'Drink'
   return (
-    <article className="grid min-h-[65px] grid-cols-[56px_1fr_auto] items-center gap-[7px] rounded-[10px] border border-[#eee5dd] bg-white p-[6px] shadow-[0_2px_8px_rgba(74,49,32,0.05)] min-[700px]:min-h-[90px] min-[700px]:grid-cols-[76px_1fr_auto]">
-      {drink ? (
-        <div className="grid h-[51px] w-[51px] place-items-center rounded-lg bg-[#edf4ff] text-[26px] text-[#1052a4] min-[700px]:h-[70px] min-[700px]:w-[70px]">🥤</div>
+    <article className="grid min-h-[88px] grid-cols-[64px_1fr_auto] items-center gap-3 rounded-xl border border-[#eee5dd] bg-white p-3 shadow-[0_2px_8px_rgba(74,49,32,0.05)] min-[700px]:min-h-[100px] min-[700px]:grid-cols-[76px_1fr_auto]">
+      {isDrink ? (
+        <div className="grid h-14 w-14 place-items-center rounded-lg bg-[#edf4ff] text-3xl text-[#1052a4] min-[700px]:h-[70px] min-[700px]:w-[70px]">🥤</div>
       ) : (
-        <img className="h-[51px] w-[51px] rounded-full object-cover min-[700px]:h-[70px] min-[700px]:w-[70px]" src={image} alt="" />
+        <img className="h-14 w-14 rounded-full object-cover min-[700px]:h-[70px] min-[700px]:w-[70px]" src={item.image} alt="" />
       )}
       <div className="min-w-0">
-        <strong className="block text-[9px] leading-tight">{name}</strong>
-        <span className="block text-[8px] leading-[1.25]">{size}</span>
-        {protein && <span className="block text-[8px] leading-[1.25]">{protein}</span>}
-        <b className="mt-[2px] block text-[9px]">{price}</b>
+        <strong className="block text-sm leading-tight">{item.name}</strong>
+        <span className="mt-1 block text-xs text-[#70665f]">{item.description} · {item.quantity} {item.quantity === 1 ? 'item' : 'items'}</span>
+        <b className="mt-1 block text-sm">{currency(item.quantity * item.unitPrice)}</b>
       </div>
       <div className="flex h-full flex-col items-end justify-between">
-        <button className="text-[#918780]" aria-label={`Remove ${name}`}><Icon name="trash" size={12} /></button>
-        <div className={`${quantityControlClass} h-[21px] gap-[7px] px-[6px]`}>
-          <button aria-label={`Decrease ${name} quantity`}>−</button><span>10</span><button aria-label={`Increase ${name} quantity`}>+</button>
-        </div>
+        <button type="button" className="text-[#918780]" aria-label={`Remove ${item.name}`} onClick={() => onQuantityChange(0)}><Icon name="trash" size={16} /></button>
+        <QuantityControl label={item.name} quantity={item.quantity} onChange={onQuantityChange} />
       </div>
     </article>
   )
@@ -87,21 +84,21 @@ export function CheckoutPage({ customer, onCustomerChange, onNavigate }: Checkou
   return (
     <div className={`${screenClass} pb-[60px]`}>
       <Header title="Checkout" onNavigate={onNavigate} />
-      <form className={`${pageContentClass} px-[10px] pb-2 pt-[6px] min-[700px]:mx-auto min-[700px]:my-3 min-[700px]:w-full min-[700px]:max-w-[720px] min-[700px]:p-5`}>
-        <div className="grid h-[37px] grid-cols-2 gap-[5px] rounded-[9px] border border-[#eee3da] p-[3px]">
-          <button type="button" onClick={() => setDelivery(true)} className={`flex items-center justify-center gap-[5px] rounded-[7px] text-[9px] ${delivery ? 'border border-[#ff6b1a] bg-[#fff0e7] font-bold text-[#e9550b]' : 'text-[#685f59]'}`}><Icon name="truck" size={14} />Delivery</button>
-          <button type="button" onClick={() => setDelivery(false)} className={`flex items-center justify-center gap-[5px] rounded-[7px] text-[9px] ${!delivery ? 'border border-[#ff6b1a] bg-[#fff0e7] font-bold text-[#e9550b]' : 'text-[#685f59]'}`}><Icon name="bag" size={14} />Collection</button>
+      <form className={`${pageContentClass} px-4 pb-3 pt-3 min-[700px]:mx-auto min-[700px]:my-3 min-[700px]:w-full min-[700px]:max-w-[720px] min-[700px]:p-5`}>
+        <div className="grid h-12 grid-cols-2 gap-2 rounded-xl border border-[#eee3da] p-1">
+          <button type="button" onClick={() => setDelivery(true)} className={`flex items-center justify-center gap-2 rounded-lg text-sm ${delivery ? 'border border-[#ff6b1a] bg-[#fff0e7] font-bold text-[#e9550b]' : 'text-[#685f59]'}`}><Icon name="truck" size={16} />Delivery</button>
+          <button type="button" onClick={() => setDelivery(false)} className={`flex items-center justify-center gap-2 rounded-lg text-sm ${!delivery ? 'border border-[#ff6b1a] bg-[#fff0e7] font-bold text-[#e9550b]' : 'text-[#685f59]'}`}><Icon name="bag" size={16} />Collection</button>
         </div>
-        <h3 className="mb-[5px] mt-[8px] text-[10px] font-bold">Customer Details</h3>
+        <h3 className="mb-2 mt-4 text-base font-bold">Customer Details</h3>
         <CheckoutField label="Full Name" icon="♙" value={customer.fullName} onChange={(value) => update('fullName', value)} />
         <CheckoutField label="Phone Number" icon="♧" value={customer.phone} onChange={(value) => update('phone', value)} />
         <CheckoutField label="Email Address" icon="✉" value={customer.email} onChange={(value) => update('email', value)} />
         <CheckoutField label={delivery ? 'Delivery Address' : 'Collection Location'} icon="⌖" value={customer.address} onChange={(value) => update('address', value)} />
         <CheckoutField label="Preferred Date & Time" icon="▦" value={customer.deliveryDate} onChange={(value) => update('deliveryDate', value)} />
-        <label className="mt-[1px] block text-[8px] font-medium text-[#514740]">
+        <label className="mt-2 block text-sm font-medium text-[#514740]">
           Special Instructions (Optional)
           <textarea
-            className="mt-[3px] block h-[39px] w-full resize-none rounded-[7px] border border-[#eee5dd] bg-white px-[8px] py-[6px] text-[8px] font-normal text-[#554841]"
+            className="mt-1 block min-h-20 w-full resize-y rounded-lg border border-[#eee5dd] bg-white px-3 py-2 text-sm font-normal text-[#554841]"
             value={customer.specialInstructions}
             onChange={(event) => update('specialInstructions', event.target.value)}
             placeholder="Ring the bell, please."
@@ -117,11 +114,11 @@ export function CheckoutPage({ customer, onCustomerChange, onNavigate }: Checkou
 
 function CheckoutField({ label, icon, value, onChange }: { label: string; icon: string; value: string; onChange: (value: string) => void }) {
   return (
-    <label className="mb-[4px] grid grid-cols-[21px_1fr] items-center gap-[5px] text-[8px] font-medium text-[#514740]">
-      <span className="grid h-[18px] w-[18px] place-items-center rounded-full bg-[#fff0e7] text-[10px] text-[#f06418]">{icon}</span>
+    <label className="mb-3 grid grid-cols-[30px_1fr] items-center gap-2 text-sm font-medium text-[#514740]">
+      <span className="grid h-7 w-7 place-items-center rounded-full bg-[#fff0e7] text-sm text-[#f06418]">{icon}</span>
       <span>{label}
         <input
-          className="mt-[2px] block h-[29px] w-full rounded-[7px] border border-[#eee5dd] bg-white px-[8px] text-[8px] font-normal text-[#403831]"
+          className="mt-1 block h-11 w-full rounded-lg border border-[#eee5dd] bg-white px-3 text-sm font-normal text-[#403831]"
           value={value}
           onChange={(event) => onChange(event.target.value)}
         />

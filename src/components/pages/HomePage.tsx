@@ -7,9 +7,10 @@ interface HomePageProps {
   screen: Screen;
   onNavigate: (screen: Screen) => void;
   onSelectRice: (rice: RiceType) => void;
+  cartCount: number;
 }
 
-export function HomePage({ screen, onNavigate, onSelectRice }: HomePageProps) {
+export function HomePage({ screen, onNavigate, onSelectRice, cartCount }: HomePageProps) {
   return (
     <div     className="relative flex h-svh min-h-svh w-full flex-col overflow-x-hidden overflow-y-auto bg-[#fff6ec] min-[700px]:block min-[700px]:h-auto min-[700px]:min-h-screen min-[700px]:overflow-visible min-[700px]:bg-[#fffdfa]">
       <header className="fixed top-0 left-0 z-30 hidden h-[86px] w-full items-center justify-between bg-[#342820] px-[max(5vw,32px)] text-white min-[700px]:flex">
@@ -118,19 +119,19 @@ export function HomePage({ screen, onNavigate, onSelectRice }: HomePageProps) {
           {menuItems.map((item) => (
             <article key={item.id} className="relative min-w-0 overflow-hidden rounded-[15px] border border-[#f2e4d8] bg-gradient-to-b from-[#fffdfa] to-[#fffaf5] px-1.5 pb-[9px] pt-[5px] shadow-[0_2px_7px_rgba(65,36,18,0.1)] transition hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(66,39,22,0.12)] min-[700px]:rounded-2xl min-[700px]:border-[#eee6de] min-[700px]:p-3">
               <img
-                className="h-[clamp(60px,18vw,72px)] w-full rounded-[11px] object-cover min-[700px]:h-[clamp(170px,18vw,235px)]"
+                className="h-[clamp(76px,20vw,90px)] w-full rounded-[11px] object-cover min-[700px]:h-[clamp(170px,18vw,235px)]"
                 src={item.image}
                 alt={item.name}
               />
-              <h3 className="mx-[7px] mb-[3px] mt-[7px] text-xs font-bold text-[#16120f] min-[700px]:mb-[5px] min-[700px]:mt-[13px] min-[700px]:text-lg">
+              <h3 className="mx-[7px] mb-[3px] mt-[7px] text-sm font-bold text-[#16120f] min-[700px]:mb-[5px] min-[700px]:mt-[13px] min-[700px]:text-lg">
                 {item.name}
               </h3>
               <p className="mx-[7px] mb-1 hidden text-[11px] text-[#81766f] min-[700px]:block">
                 {item.description}
               </p>
-              <strong className="ml-[7px] block text-[11px] text-[#29211b] min-[700px]:text-xs">
+              {/* <strong className="ml-[7px] block text-xs text-[#29211b] min-[700px]:text-xs">
                 From ₦{item.price.toLocaleString()}
-              </strong>
+              </strong> */}
               <button
                 className="absolute bottom-2 right-[7px] grid h-[26px] w-[26px] place-items-center rounded-full bg-gradient-to-br from-[#ff9a08] to-[#f45b14] text-[17px] font-extrabold text-white min-[700px]:bottom-3.5 min-[700px]:right-3.5 min-[700px]:h-[34px] min-[700px]:w-[34px]"
                 aria-label={`Add ${item.name}`}
@@ -185,7 +186,7 @@ export function HomePage({ screen, onNavigate, onSelectRice }: HomePageProps) {
           </div>
         ))}
       </section>
-      <BottomNav screen={screen} onNavigate={onNavigate} home />
+      <BottomNav screen={screen} onNavigate={onNavigate} cartCount={cartCount} home />
     </div>
   );
 }

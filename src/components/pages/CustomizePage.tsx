@@ -42,7 +42,7 @@ export function CustomizePage(props: CustomizePageProps) {
         <section className="mb-4">
           <h3 className="mb-2 text-base font-bold">Select Plate Size</h3>
           <div className="grid grid-cols-2 gap-3">
-            {([['Medium', '₦2,500', foodImages.jollof], ['Big', '₦3,500', foodImages.mixed]] as const).map(([size, price, image]) => (
+            {([['Medium', '₦2,300', '20: ₦46,000 · 30: ₦69,000 · 50: ₦115,000', foodImages.jollof], ['Big', '₦3,200', '20: ₦64,000 · 30: ₦95,000 · 50: ₦160,000', foodImages.mixed]] as const).map(([size, price, bulkPrices, image]) => (
               <button
                 type="button"
                 key={size}
@@ -53,7 +53,8 @@ export function CustomizePage(props: CustomizePageProps) {
                 <img className="h-[clamp(64px,20vw,88px)] w-[clamp(64px,20vw,88px)] rounded-full object-cover" src={image} alt="" />
                 <span className="text-center">
                   <strong className="block text-sm">{size} Plate</strong>
-                  <b className="mt-1 block text-sm font-semibold text-[#6f6259]">{price}</b>
+                  <b className="mt-1 block text-sm font-semibold text-[#6f6259]">{price} / plate</b>
+                  <small className="mt-1 block max-w-[220px] text-[10px] leading-4 text-[#87796f]">{bulkPrices}</small>
                 </span>
               </button>
             ))}

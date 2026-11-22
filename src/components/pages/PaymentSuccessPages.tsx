@@ -14,6 +14,7 @@ interface PaymentPageProps {
 export function PaymentPage({ total, onNavigate, onPay }: PaymentPageProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [agreedToTerms, setAgreedToTerms] = useState(() => sessionStorage.getItem('dmk-terms-agreed') === 'true')
 
   const pay = async () => {
     setLoading(true)
@@ -43,8 +44,24 @@ export function PaymentPage({ total, onNavigate, onPay }: PaymentPageProps) {
           <p className="mt-1 text-sm leading-relaxed text-[#716a64]">Choose card, bank transfer, USSD, or another available option on the secure Paystack page.</p>
         </div>
       </section>
+      <label className="mx-4 mt-5 flex cursor-pointer items-start gap-3 text-sm leading-5 text-[#514740] min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[680px]">
+        <input
+          type="checkbox"
+          checked={agreedToTerms}
+          onChange={(event) => {
+            setAgreedToTerms(event.target.checked)
+            sessionStorage.setItem('dmk-terms-agreed', String(event.target.checked))
+          }}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-[#ed6916]"
+        />
+        <span>
+          I have read and agree to the{' '}
+          <a href="/terms" className="font-bold text-[#e9550b] underline underline-offset-2">Terms and Conditions</a>
+          {' '}of DMK – De_Mayor Kitchen.
+        </span>
+      </label>
       {error && <p role="alert" className="mx-3 mt-2 text-center text-[10px] text-red-700">{error}</p>}
-      <button className={primaryActionClass} onClick={() => void pay()} disabled={loading}>
+      <button className={primaryActionClass} onClick={() => void pay()} disabled={loading || !agreedToTerms}>
         {loading ? 'Connecting to Paystack…' : <>Continue to Paystack <b className="ml-2">→</b></>}
       </button>
     </div>

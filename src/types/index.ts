@@ -7,14 +7,19 @@ export type Screen =
   | 'payment'
   | 'success'
   | 'track'
+  | 'terms'
   | 'admin'
   | 'admin-login'
 
 export type RiceType = 'Jollof Rice' | 'Mixed Rice'
 export type PlateSize = 'Medium' | 'Big'
 export type Protein = 'Chicken' | 'Beef'
-export type ExtraId = 'extra-beef' | 'extra-chicken'
-export type DrinkId = 'pepsi'
+export type ExtraId =
+  | 'extra-beef'
+  | 'extra-chicken'
+  | 'extra-plantain'
+  | 'extra-egg'
+export type DrinkId = 'pepsi' | 'table-water'
 
 export interface CartItem {
   id: string

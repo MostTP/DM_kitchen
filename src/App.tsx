@@ -7,6 +7,7 @@ import { CartPage, CheckoutPage } from "./components/pages/CartCheckoutPages";
 import { CustomizePage } from "./components/pages/CustomizePage";
 import { HomePage } from "./components/pages/HomePage";
 import { MenuPage } from "./components/pages/MenuPage";
+import { TermsPage } from "./components/pages/TermsPage";
 import {
   PaymentPage,
   SuccessPage,
@@ -54,9 +55,12 @@ function App() {
   const [extraQuantities, setExtraQuantities] = useState<Record<ExtraId, number>>({
     "extra-beef": 0,
     "extra-chicken": 0,
+    "extra-plantain": 0,
+    "extra-egg": 0,
   });
   const [drinkQuantities, setDrinkQuantities] = useState<Record<DrinkId, number>>({
     pepsi: 0,
+    "table-water": 0,
   });
   const [orderId, setOrderId] = useState("");
   const [customer, setCustomer] = useState<CustomerDetails>({
@@ -257,6 +261,9 @@ function App() {
       )}
       {activeScreen === "success" && (
         <SuccessPage orderId={orderId} onNavigate={navigate} />
+      )}
+      {activeScreen === "terms" && (
+        <TermsPage onNavigate={navigate} />
       )}
       {activeScreen === "track" && (
         <AccountPage

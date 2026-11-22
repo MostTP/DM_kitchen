@@ -2,9 +2,9 @@ import type { CartItem, DrinkId, ExtraId, PlateSize, Protein, RiceType } from '.
 
 export const foodImages = {
   jollof:
-    'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=85',
+    '/jollof.jpeg',
   mixed:
-    'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=85',
+    '/mixed.jpeg',
 }
 
 export const menuItems = [
@@ -12,14 +12,14 @@ export const menuItems = [
     id: 'jollof',
     name: 'Jollof Rice' as const,
     description: 'Classic Nigerian jollof rice.',
-    price: 2500,
+    price: 2300,
     image: foodImages.jollof,
   },
   {
     id: 'mixed',
     name: 'Mixed Rice' as const,
     description: 'A perfect blend of jollof and fried rice.',
-    price: 2500,
+    price: 2300,
     image: foodImages.mixed,
   },
 ]
@@ -32,6 +32,8 @@ export const extraItems: {
 }[] = [
   { id: 'extra-beef', name: 'Extra Beef', emoji: '🥩', price: 800 },
   { id: 'extra-chicken', name: 'Extra Chicken', emoji: '🍗', price: 1300 },
+  { id: 'extra-plantain', name: 'Extra Plantain', emoji: '🍌', price: 150 },
+  { id: 'extra-egg', name: 'Extra Egg', emoji: '🥚', price: 500 },
 ]
 
 export const drinkItems: {
@@ -39,7 +41,10 @@ export const drinkItems: {
   name: string
   emoji: string
   price: number
-}[] = [{ id: 'pepsi', name: 'Pepsi', emoji: '🥤', price: 400 }]
+}[] = [
+  { id: 'pepsi', name: 'Pepsi', emoji: '🥤', price: 490 },
+  { id: 'table-water', name: 'Table Water', emoji: '💧', price: 295 },
+]
 
 export function buildCartItems(
   rice: RiceType,
@@ -48,7 +53,7 @@ export function buildCartItems(
   extras: Record<ExtraId, number>,
   drinks: Record<DrinkId, number>,
 ): CartItem[] {
-  const platePrice = plate === 'Medium' ? 2500 : 3500
+  const platePrice = plate === 'Medium' ? 2300 : 3200
   const riceImage = rice === 'Jollof Rice' ? foodImages.jollof : foodImages.mixed
   const items: CartItem[] = (['Chicken', 'Beef'] as const)
     .filter((protein) => proteins[protein] > 0)

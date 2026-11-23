@@ -5,8 +5,6 @@ export type AccountOrder = Pick<
   'orderId' | 'customer' | 'items' | 'subtotal' | 'deliveryFee' | 'total' | 'paymentStatus' | 'status' | 'createdAt'
 >
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '')
-
 async function getError(response: Response, fallback: string) {
   const body = await response.json().catch(() => null)
   return new Error(typeof body?.error === 'string' ? body.error : fallback)
@@ -14,16 +12,10 @@ async function getError(response: Response, fallback: string) {
 
 async function fetchApi(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   try {
-    const requestUrl =
-      apiBaseUrl && typeof input === 'string' && input.startsWith('/api/')
-        ? new URL(input, `${apiBaseUrl}/`)
-        : input
-    return await fetch(requestUrl, init)
+    return await fetch(input, init)
   } catch (error) {
     if (error instanceof TypeError) {
-      const setupHint = apiBaseUrl
-        ? 'Check NEXT_PUBLIC_API_URL in the frontend deployment and confirm the API server is online.'
-        : 'Start the local API and web app with `npm run dev` and try again.'
+      const setupHint = 'Ensure the Next.js app is running and try again.'
       throw new Error(
         `Could not connect to the order service. ${setupHint}`,
         { cause: error },

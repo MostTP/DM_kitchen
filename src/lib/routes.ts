@@ -9,7 +9,6 @@ export const screenPaths: Record<Screen, string> = {
   payment: '/payment',
   success: '/success',
   track: '/account',
-  terms: '/terms',
   admin: '/admin',
   'admin-login': '/admin/login',
 }

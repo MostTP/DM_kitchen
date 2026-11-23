@@ -7,7 +7,6 @@ export type Screen =
   | 'payment'
   | 'success'
   | 'track'
-  | 'terms'
   | 'admin'
   | 'admin-login'
 

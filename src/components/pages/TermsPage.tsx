@@ -1,10 +1,4 @@
-import type { Screen } from '../../types'
-import { pageContentClass, screenClass } from '../../styles/classes'
-import { Header } from '../Header'
-
-interface TermsPageProps {
-  onNavigate: (screen: Screen) => void
-}
+import { pageContentClass } from '../../styles/classes'
 
 const sections = [
   ['1. About DMK', `DMK – De_Mayor Kitchen is a food and catering business providing freshly prepared meals, food packages, bulk food orders, catering services and related services for individuals, families, students, organisations and special occasions.
@@ -58,11 +52,10 @@ Changes do not retrospectively remove rights already acquired under applicable l
 Disputes arising from DMK services should first be addressed through reasonable communication and mutual efforts to reach a resolution, without limiting either party’s legal rights.`],
 ] as const
 
-export function TermsPage({ onNavigate }: TermsPageProps) {
+export function TermsContent() {
   return (
-    <div className={`${screenClass} pb-8`}>
-      <Header title="Terms & Conditions" onNavigate={onNavigate} />
-      <article className={`${pageContentClass} mx-auto max-w-[840px] px-4 py-5 text-[#514740] min-[700px]:px-8 min-[700px]:py-8`}>
+    <div>
+      <article className={`${pageContentClass} mx-auto max-w-[840px] px-5 py-5 text-[#514740]`}>
         <div className="mb-6">
           <p className="text-sm font-bold text-[#e9550b]">Effective Date: 20th November 2026</p>
           <h1 className="mt-2 text-2xl font-extrabold text-[#2a201b]">DMK – De_Mayor Kitchen</h1>

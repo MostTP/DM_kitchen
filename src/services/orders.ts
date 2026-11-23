@@ -5,7 +5,7 @@ export type AccountOrder = Pick<
   'orderId' | 'customer' | 'items' | 'subtotal' | 'deliveryFee' | 'total' | 'paymentStatus' | 'status' | 'createdAt'
 >
 
-const apiBaseUrl = import.meta.env.VITE_API_URL?.replace(/\/+$/, '')
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '')
 
 async function getError(response: Response, fallback: string) {
   const body = await response.json().catch(() => null)
@@ -22,7 +22,7 @@ async function fetchApi(input: RequestInfo | URL, init?: RequestInit): Promise<R
   } catch (error) {
     if (error instanceof TypeError) {
       const setupHint = apiBaseUrl
-        ? 'Check VITE_API_URL in the frontend deployment and confirm the API server is online.'
+        ? 'Check NEXT_PUBLIC_API_URL in the frontend deployment and confirm the API server is online.'
         : 'Start the local API and web app with `npm run dev` and try again.'
       throw new Error(
         `Could not connect to the order service. ${setupHint}`,

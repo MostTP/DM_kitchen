@@ -42,15 +42,14 @@ export function CustomizePage(props: CustomizePageProps) {
         <section className="mb-4">
           <h3 className="mb-2 text-base font-bold">Select Plate Size</h3>
           <div className="grid grid-cols-2 gap-3">
-            {([['Medium', '₦2,300', '20: ₦46,000 · 30: ₦69,000 · 50: ₦115,000', foodImages.jollof], ['Big', '₦3,200', '20: ₦64,000 · 30: ₦95,000 · 50: ₦160,000', foodImages.mixed]] as const).map(([size, price, bulkPrices, image]) => (
+            {([['Medium', '₦2,300', '20: ₦46,000 · 30: ₦69,000 · 50: ₦115,000'], ['Big', '₦3,200', '20: ₦64,000 · 30: ₦95,000 · 50: ₦160,000']] as const).map(([size, price, bulkPrices]) => (
               <button
                 type="button"
                 key={size}
-                className={`relative flex min-w-0 flex-col items-center justify-center gap-2 rounded-xl border bg-white p-2 text-center shadow-[0_2px_8px_rgba(74,49,32,0.06)] min-[700px]:h-[205px] ${plate === size ? 'border-[#ff6b1a]' : 'border-[#eee5dd]'}`}
+                className={`relative flex min-h-[142px] min-w-0 flex-col items-center justify-center gap-2 rounded-xl border bg-white p-3 text-center shadow-[0_2px_8px_rgba(74,49,32,0.06)] min-[700px]:h-[205px] ${plate === size ? 'border-[#ff6b1a]' : 'border-[#eee5dd]'}`}
                 onClick={() => props.onPlateChange(size)}
               >
                 {plate === size && <span className="absolute right-2 top-2 text-sm font-bold text-[#ff711e]" aria-label="Selected">✓</span>}
-                <img className="h-[clamp(64px,20vw,88px)] w-[clamp(64px,20vw,88px)] rounded-full object-cover" src={image} alt="" />
                 <span className="text-center">
                   <strong className="block text-sm">{size} Plate</strong>
                   <b className="mt-1 block text-sm font-semibold text-[#6f6259]">{price} / plate</b>

@@ -23,6 +23,7 @@ interface AccountPageProps {
 const money = (amount: number) => `₦${amount.toLocaleString()}`
 const prettyStatus = (status: string) => status.replaceAll('_', ' ')
 const oauthCallbackError = (() => {
+  if (typeof window === 'undefined') return ''
   const query = new URLSearchParams(window.location.search)
   const fragment = new URLSearchParams(window.location.hash.slice(1))
   const description =
@@ -102,7 +103,7 @@ export function AccountPage({
 
   const signInWithGoogle = async () => {
     if (!supabase) {
-      setAuthError('Google sign-in is not configured in this deployment. Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your hosting settings, then rebuild and redeploy.')
+      setAuthError('Google sign-in is not configured in this deployment. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your hosting settings, then rebuild and redeploy.')
       return
     }
     setAuthLoading(true)

@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { AccountPage } from "./components/pages/AccountPage";
@@ -7,7 +9,6 @@ import { CartPage, CheckoutPage } from "./components/pages/CartCheckoutPages";
 import { CustomizePage } from "./components/pages/CustomizePage";
 import { HomePage } from "./components/pages/HomePage";
 import { MenuPage } from "./components/pages/MenuPage";
-import { TermsPage } from "./components/pages/TermsPage";
 import {
   PaymentPage,
   SuccessPage,
@@ -36,7 +37,9 @@ import type {
 const DELIVERY_FEE = 1000;
 
 function App() {
-  const [screen, setScreen] = useState<Screen>(() => getScreenFromPath(window.location.pathname));
+  const [screen, setScreen] = useState<Screen>(() =>
+    typeof window === "undefined" ? "home" : getScreenFromPath(window.location.pathname)
+  );
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(!supabase);
   const [accountResult, setAccountResult] = useState<{
@@ -75,9 +78,15 @@ function App() {
     !session && (screen === "checkout" || screen === "payment") ? "track" : screen;
 
   useEffect(() => {
+    const initialFrame = window.requestAnimationFrame(() => {
+      setScreen(getScreenFromPath(window.location.pathname));
+    });
     const handlePopState = () => setScreen(getScreenFromPath(window.location.pathname));
     window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
+    return () => {
+      window.cancelAnimationFrame(initialFrame);
+      window.removeEventListener("popstate", handlePopState);
+    };
   }, []);
 
   useEffect(() => {
@@ -261,9 +270,6 @@ function App() {
       )}
       {activeScreen === "success" && (
         <SuccessPage orderId={orderId} onNavigate={navigate} />
-      )}
-      {activeScreen === "terms" && (
-        <TermsPage onNavigate={navigate} />
       )}
       {activeScreen === "track" && (
         <AccountPage

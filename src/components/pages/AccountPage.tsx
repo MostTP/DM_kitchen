@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { screenPaths } from '../../lib/routes'
 import type { Screen } from '../../types'
@@ -49,6 +49,7 @@ export function AccountPage({
   const [authMessage, setAuthMessage] = useState('')
   const [authError, setAuthError] = useState(oauthCallbackError)
   const [authLoading, setAuthLoading] = useState(false)
+  const [resendCooldown, setResendCooldown] = useState(0)
   const displayName = String(
     session?.user.user_metadata.full_name ??
     session?.user.user_metadata.name ??
@@ -61,6 +62,12 @@ export function AccountPage({
     .map((part) => part[0]?.toUpperCase() ?? '')
     .join('')
   const activeOrders = orders.filter((order) => !['completed', 'cancelled'].includes(order.status ?? 'new')).length
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return
+    const timer = window.setTimeout(() => setResendCooldown((seconds) => seconds - 1), 1000)
+    return () => window.clearTimeout(timer)
+  }, [resendCooldown])
 
   const requestEmailCode = async () => {
     if (!supabase) {
@@ -85,6 +92,7 @@ export function AccountPage({
       return
     }
     setCodeSent(true)
+    setResendCooldown(30)
     setAuthMessage('Check your email for a sign-in code.')
   }
 
@@ -266,16 +274,26 @@ export function AccountPage({
               />
             </label>
             {codeSent && (
-              <label className="mt-3 block text-sm font-medium">
-                Email sign-in code
-                <input
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  value={code}
-                  onChange={(event) => setCode(event.target.value)}
-                  className="mt-1 h-12 w-full rounded-lg border border-[#eee5dd] px-3 text-base"
-                />
-              </label>
+              <>
+                <label className="mt-3 block text-sm font-medium">
+                  Email sign-in code
+                  <input
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={code}
+                    onChange={(event) => setCode(event.target.value)}
+                    className="mt-1 h-12 w-full rounded-lg border border-[#eee5dd] px-3 text-base"
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => void requestEmailCode()}
+                  disabled={authLoading || resendCooldown > 0}
+                  className="mt-3 min-h-10 text-sm font-semibold text-[#e9550b] underline underline-offset-2 disabled:cursor-not-allowed disabled:text-[#918780] disabled:no-underline"
+                >
+                  {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend code'}
+                </button>
+              </>
             )}
             {authError && <p role="alert" className="mt-3 text-sm text-red-700">{authError}</p>}
             {authMessage && <p role="status" className="mt-3 text-sm text-green-700">{authMessage}</p>}

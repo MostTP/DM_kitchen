@@ -18,7 +18,7 @@ export type ExtraId =
   | 'extra-chicken'
   | 'extra-plantain'
   | 'extra-egg'
-export type DrinkId = 'pepsi' | 'table-water'
+export type DrinkId = 'drink' | 'table-water'
 
 export interface CartItem {
   id: string

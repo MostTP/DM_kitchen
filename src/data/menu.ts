@@ -42,7 +42,7 @@ export const drinkItems: {
   emoji: string
   price: number
 }[] = [
-  { id: 'pepsi', name: 'Pepsi', emoji: '🥤', price: 490 },
+  { id: 'drink', name: 'Drink', emoji: '🥤', price: 490 },
   { id: 'table-water', name: 'Table Water', emoji: '💧', price: 295 },
 ]
 

@@ -62,7 +62,7 @@ function App() {
     "extra-egg": 0,
   });
   const [drinkQuantities, setDrinkQuantities] = useState<Record<DrinkId, number>>({
-    pepsi: 0,
+    drink: 0,
     "table-water": 0,
   });
   const [orderId, setOrderId] = useState("");

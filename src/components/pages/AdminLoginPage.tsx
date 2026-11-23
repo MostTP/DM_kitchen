@@ -54,7 +54,7 @@ export function AdminLoginPage({
   }
 
   return (
-    <div className={`${screenClass} pb-[60px]`}>
+    <div className={`${screenClass}`}>
       <Header title="Admin Sign In" backTarget="track" onNavigate={onNavigate} rightAction="none" />
       <div className="flex-1 overflow-y-auto px-4 py-8 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[520px] min-[700px]:pt-16">
         <form onSubmit={(event) => void signIn(event)} className="rounded-3xl border border-[#eee5dd] bg-white p-6 shadow-[0_12px_35px_rgba(74,49,32,0.08)] min-[700px]:p-8">

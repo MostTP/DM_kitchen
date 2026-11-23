@@ -32,7 +32,7 @@ export function PaymentPage({ total, onNavigate, onPay }: PaymentPageProps) {
   }
 
   return (
-    <div className={`${screenClass} pb-[60px]`}>
+    <div className={`${screenClass}`}>
       <Header title="Payment" onNavigate={onNavigate} rightAction="none" />
       <div className="mx-4 mt-3 flex h-20 flex-col items-center justify-center rounded-xl min-[700px]:mx-auto min-[700px]:mt-7 min-[700px]:h-[110px] min-[700px]:max-w-[1124px]">
         <span className="text-sm">Amount to Pay</span>

@@ -141,7 +141,7 @@ export function AccountPage({
   }
 
   return (
-    <div className={`${screenClass} pb-[60px]`}>
+    <div className={`${screenClass}`}>
       <Header title="My Account" rightAction="none" onNavigate={onNavigate} />
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-4 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[960px] min-[700px]:px-7 min-[700px]:py-8">
         {session ? (

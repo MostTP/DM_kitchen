@@ -18,7 +18,7 @@ const currency = (amount: number) => `₦${amount.toLocaleString()}`
 export function CartPage({ items, deliveryFee, onNavigate, onItemQuantityChange }: CartPageProps) {
   const subtotal = items.reduce((total, item) => total + item.quantity * item.unitPrice, 0)
   return (
-    <div className={`${screenClass} pb-[60px]`}>
+    <div className={`${screenClass}`}>
       <Header title="Your Cart" rightAction="none" onNavigate={onNavigate} />
       <div className={`${pageContentClass} px-4 pt-3 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[1124px] min-[700px]:px-7 min-[700px]:py-6`}>
         {items.length > 0 ? (
@@ -86,7 +86,7 @@ export function CheckoutPage({ customer, receiptEmail, onCustomerChange, onNavig
   const update = (field: keyof CustomerDetails, value: string) => onCustomerChange({ ...customer, [field]: value })
 
   return (
-    <div className={`${screenClass} pb-[60px]`}>
+    <div className={`${screenClass}`}>
       <Header title="Checkout" onNavigate={onNavigate} />
       <form className={`${pageContentClass} px-4 pb-3 pt-3 min-[700px]:mx-auto min-[700px]:my-3 min-[700px]:w-full min-[700px]:max-w-[720px] min-[700px]:p-5`}>
         <div className="grid h-12 grid-cols-2 gap-2 rounded-xl border border-[#eee3da] p-1">

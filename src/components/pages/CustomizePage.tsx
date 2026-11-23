@@ -22,7 +22,7 @@ interface CustomizePageProps {
 export function CustomizePage(props: CustomizePageProps) {
   const { rice, plate, proteinQuantities } = props
   return (
-    <div className={`${screenClass} pb-[60px]`}>
+    <div className={`${screenClass}`}>
       <Header title="Customise Order" rightAction="cart" cartCount={props.cartCount} onNavigate={props.onNavigate} />
       <div className={`${pageContentClass} px-4 pb-3 pt-3 min-[700px]:mx-auto min-[700px]:w-full min-[700px]:max-w-[1124px] min-[700px]:px-7 min-[700px]:py-6`}>
         <div className="mb-4 flex items-center gap-3 rounded-xl border border-[#eee5dd] bg-white p-3">

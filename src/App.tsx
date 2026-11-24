@@ -74,6 +74,7 @@ function App() {
     address: "",
     deliveryDate: "",
     specialInstructions: "",
+    fulfillmentMethod: undefined,
   });
   const activeScreen =
     !session && (screen === "checkout" || screen === "payment") ? "track" : screen;
@@ -165,7 +166,8 @@ function App() {
   const cartItems = buildCartItems(rice, plate, proteinQuantities, extraQuantities, drinkQuantities);
   const subtotal = cartItems.reduce((total, item) => total + item.quantity * item.unitPrice, 0);
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-  const orderTotal = subtotal + DELIVERY_FEE;
+  const deliveryFee = customer.fulfillmentMethod === "delivery" ? DELIVERY_FEE : 0;
+  const orderTotal = subtotal + deliveryFee;
 
   const navigate = (nextScreen: Screen) => {
     if ((nextScreen === "checkout" || nextScreen === "payment") && !session) {
@@ -191,7 +193,11 @@ function App() {
   const handlePay = async () => {
     if (!session) throw new PublicError("Sign in to your account before placing an order.");
     const orderCustomer = { ...customer, email: session.user.email ?? customer.email };
-    const demoOrder = await createLocalDemoOrder(orderCustomer, cartItems, DELIVERY_FEE);
+    if (!customer.fulfillmentMethod) throw new PublicError("Select delivery or collection before placing your order.");
+    if (customer.fulfillmentMethod === "delivery" && !customer.address.trim()) {
+      throw new PublicError("Enter a delivery address before placing your order.");
+    }
+    const demoOrder = await createLocalDemoOrder(orderCustomer, cartItems, deliveryFee);
     const result = await initializeOrder(demoOrder, session.access_token);
     setOrderId(result.orderId);
     window.location.assign(result.authorizationUrl);
@@ -240,7 +246,7 @@ function App() {
       {activeScreen === "cart" && (
         <CartPage
           items={cartItems}
-          deliveryFee={DELIVERY_FEE}
+          deliveryFee={deliveryFee}
           onNavigate={navigate}
           onItemQuantityChange={(item: CartItem, quantity: number) => {
             if (item.id === "rice-chicken" || item.id === "rice-beef") {
@@ -263,6 +269,7 @@ function App() {
           customer={customer}
           receiptEmail={session?.user.email ?? ""}
           onCustomerChange={setCustomer}
+          onFulfillmentChange={(method) => setCustomer((current) => ({ ...current, fulfillmentMethod: method }))}
           onNavigate={navigate}
         />
       )}

@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import type { CartItem as OrderCartItem, CustomerDetails, Screen } from '../../types'
+import type { CartItem as OrderCartItem, CustomerDetails, FulfillmentMethod, Screen } from '../../types'
 import { Header } from '../Header'
 import { Icon } from '../Icon'
 import { ScreenLink } from '../ScreenLink'
@@ -78,25 +77,34 @@ interface CheckoutPageProps {
   customer: CustomerDetails
   receiptEmail: string
   onCustomerChange: (customer: CustomerDetails) => void
+  onFulfillmentChange: (method: FulfillmentMethod) => void
   onNavigate: (screen: Screen) => void
 }
 
-export function CheckoutPage({ customer, receiptEmail, onCustomerChange, onNavigate }: CheckoutPageProps) {
-  const [delivery, setDelivery] = useState(true)
+export function CheckoutPage({ customer, receiptEmail, onCustomerChange, onFulfillmentChange, onNavigate }: CheckoutPageProps) {
+  const delivery = customer.fulfillmentMethod === 'delivery'
+  const collection = customer.fulfillmentMethod === 'collection'
   const update = (field: keyof CustomerDetails, value: string) => onCustomerChange({ ...customer, [field]: value })
+  const requiredFieldsComplete = Boolean(
+    customer.fulfillmentMethod
+    && customer.fullName.trim()
+    && customer.phone.trim()
+    && customer.deliveryDate.trim()
+    && (!delivery || customer.address.trim()),
+  )
 
   return (
     <div className={`${screenClass}`}>
       <Header title="Checkout" onNavigate={onNavigate} />
       <form className={`${pageContentClass} px-4 pb-3 pt-3 min-[700px]:mx-auto min-[700px]:my-3 min-[700px]:w-full min-[700px]:max-w-[720px] min-[700px]:p-5`}>
         <div className="grid h-12 grid-cols-2 gap-2 rounded-xl border border-[#eee3da] p-1">
-          <button type="button" onClick={() => setDelivery(true)} className={`flex items-center justify-center gap-2 rounded-lg text-sm ${delivery ? 'border border-[#ff6b1a] bg-[#fff0e7] font-bold text-[#e9550b]' : 'text-[#685f59]'}`}><Icon name="truck" size={16} />Delivery</button>
-          <button type="button" onClick={() => setDelivery(false)} className={`flex items-center justify-center gap-2 rounded-lg text-sm ${!delivery ? 'border border-[#ff6b1a] bg-[#fff0e7] font-bold text-[#e9550b]' : 'text-[#685f59]'}`}><Icon name="bag" size={16} />Collection</button>
+          <button type="button" onClick={() => onFulfillmentChange('delivery')} className={`flex items-center justify-center gap-2 rounded-lg text-sm ${delivery ? 'border border-[#ff6b1a] bg-[#fff0e7] font-bold text-[#e9550b]' : 'text-[#685f59]'}`}><Icon name="truck" size={16} />Delivery</button>
+          <button type="button" onClick={() => onFulfillmentChange('collection')} className={`flex items-center justify-center gap-2 rounded-lg text-sm ${collection ? 'border border-[#ff6b1a] bg-[#fff0e7] font-bold text-[#e9550b]' : 'text-[#685f59]'}`}><Icon name="bag" size={16} />Collection</button>
         </div>
         <h3 className="mb-3 mt-5 text-lg font-bold">Customer Details</h3>
         <CheckoutField label="Full Name" icon="person" value={customer.fullName} onChange={(value) => update('fullName', value)} />
         <CheckoutField label="Phone Number" icon="phone" value={customer.phone} onChange={(value) => update('phone', value)} />
-        <CheckoutField label={delivery ? 'Delivery Address' : 'Collection Location'} icon="pin" value={customer.address} onChange={(value) => update('address', value)} />
+        {delivery && <CheckoutField label="Delivery Address" icon="pin" value={customer.address} onChange={(value) => update('address', value)} />}
         <CheckoutField label="Preferred Date & Time" icon="calendar" value={customer.deliveryDate} onChange={(value) => update('deliveryDate', value)} />
         <div className="mb-4 flex items-start gap-3 rounded-xl border border-[#f1dfd0] bg-white/70 p-3 text-sm text-[#62574f]">
           <span className="mt-0.5 text-[#e9550b]"><Icon name="mail" size={20} /></span>
@@ -115,9 +123,14 @@ export function CheckoutPage({ customer, receiptEmail, onCustomerChange, onNavig
           />
         </label>
       </form>
-      <ScreenLink to="payment" onNavigate={onNavigate} className={primaryActionClass}>
+      <button
+        type="button"
+        onClick={() => onNavigate('payment')}
+        disabled={!requiredFieldsComplete}
+        className={`${primaryActionClass} disabled:cursor-not-allowed disabled:opacity-50`}
+      >
         Continue to Payment <b className="ml-1">→</b>
-      </ScreenLink>
+      </button>
     </div>
   )
 }

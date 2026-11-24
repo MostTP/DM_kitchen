@@ -14,6 +14,8 @@ const supabase =
       )
     : null;
 
+const DELIVERY_FEE = 1000;
+
 const orderStatuses = new Set([
   "new",
   "preparing",
@@ -413,10 +415,43 @@ export async function POST(
           error: "Supabase orders table is not ready",
         });
       const total = Number(body?.total);
-      if (!user.email || !Number.isFinite(total) || total <= 0)
-        return json(request, 400, {
-          error: "A customer email and valid order total are required",
-        });
+      const subtotal = Number(body?.subtotal);
+      const method = body?.customer?.fulfillmentMethod;
+      const submittedDeliveryFee = Number(body?.deliveryFee);
+      const customerName = String(body?.customer?.fullName ?? "").trim();
+      const customerPhone = String(body?.customer?.phone ?? "").trim();
+      const customerAddress = String(body?.customer?.address ?? "").trim();
+
+      if (!user.email || !customerName || !customerPhone)
+        return json(request, 400, { error: "Customer name and phone number are required" });
+      if (method !== "delivery" && method !== "collection")
+        return json(request, 400, { error: "Select delivery or collection for your order" });
+      if (method === "delivery" && !customerAddress)
+        return json(request, 400, { error: "A delivery address is required" });
+
+      const items = Array.isArray(body?.items) ? body.items : [];
+      const recalculatedSubtotal = items.reduce((sum: number, item: { quantity?: unknown; unitPrice?: unknown }) => {
+        const quantity = Number(item.quantity);
+        const unitPrice = Number(item.unitPrice);
+        if (!Number.isFinite(quantity) || !Number.isFinite(unitPrice) || quantity <= 0 || unitPrice < 0)
+          return Number.NaN;
+        return sum + quantity * unitPrice;
+      }, 0);
+      if (!Number.isFinite(recalculatedSubtotal) || recalculatedSubtotal <= 0)
+        return json(request, 400, { error: "A valid order is required" });
+
+      const recalculatedDeliveryFee = method === "delivery" ? DELIVERY_FEE : 0;
+      const recalculatedTotal = recalculatedSubtotal + recalculatedDeliveryFee;
+      if (
+        !Number.isFinite(subtotal)
+        || !Number.isFinite(submittedDeliveryFee)
+        || !Number.isFinite(total)
+        || Math.round(subtotal) !== Math.round(recalculatedSubtotal)
+        || submittedDeliveryFee !== recalculatedDeliveryFee
+        || Math.round(total) !== Math.round(recalculatedTotal)
+      ) {
+        return json(request, 400, { error: "The order price or delivery fee is invalid" });
+      }
       const orderId = `DMK-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`;
       const { response, result } = await paystack("/transaction/initialize", {
         method: "POST",
@@ -441,7 +476,9 @@ export async function POST(
         orderId,
         userId: user.id,
         customer: { ...body.customer, email: user.email },
-        total,
+        subtotal: recalculatedSubtotal,
+        deliveryFee: recalculatedDeliveryFee,
+        total: recalculatedTotal,
         reference: result.data.reference,
         paymentStatus: "pending",
       };

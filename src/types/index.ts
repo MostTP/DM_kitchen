@@ -29,11 +29,14 @@ export interface CartItem {
   image: string
 }
 
+export type FulfillmentMethod = 'delivery' | 'collection'
+
 export interface CustomerDetails {
   fullName: string
   phone: string
   email: string
   address: string
+  fulfillmentMethod?: FulfillmentMethod
   deliveryDate: string
   specialInstructions: string
 }

@@ -79,7 +79,7 @@ export function TermsContent() {
           <h3 className="text-base font-bold text-[#2a201b]">14. Contact Information</h3>
           <p className="mt-2 text-sm leading-6 text-justify">For enquiries, complaints, order issues or clarification regarding these Terms and Conditions:</p>
           <p className="mt-2 text-sm"><strong>DMK – De_Mayor Kitchen</strong></p>
-          <p className="mt-1 text-sm">Phone/WhatsApp: <a className="font-semibold text-[#e9550b]" href="tel:+2348055833975">+2348055833975</a></p>
+          <p className="mt-1 text-sm">Phone/WhatsApp: <a className="font-semibold text-[#e9550b]" href="https://wa.me/2348055833975" target="_blank" rel="noopener noreferrer">+2348055833975</a></p>
           <p className="mt-1 text-sm">Email: <a className="font-semibold text-[#e9550b]" href="mailto:demayorkitchen@yahoo.com">demayorkitchen@yahoo.com</a></p>
           <p className="mt-4 text-sm font-semibold">Thank you for choosing DMK – De_Mayor Kitchen.</p>
           <p className="mt-1 text-sm text-[#77706a]">Great food. Memorable moments. Excellent service.</p>

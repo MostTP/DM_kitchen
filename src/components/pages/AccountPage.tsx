@@ -23,6 +23,7 @@ interface AccountPageProps {
 
 const money = (amount: number) => `₦${amount.toLocaleString()}`
 const prettyStatus = (status: string) => status.replaceAll('_', ' ')
+const supportWhatsAppNumber = '2348055833975'
 const oauthCallbackError = (() => {
   if (typeof window === 'undefined') return ''
   const query = new URLSearchParams(window.location.search)
@@ -51,6 +52,10 @@ export function AccountPage({
   const [authError, setAuthError] = useState(oauthCallbackError)
   const [authLoading, setAuthLoading] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
+  const [supportName, setSupportName] = useState('')
+  const [supportPhone, setSupportPhone] = useState('')
+  const [supportOrderId, setSupportOrderId] = useState('')
+  const [supportComplaint, setSupportComplaint] = useState('')
   const displayName = String(
     session?.user.user_metadata.full_name ??
     session?.user.user_metadata.name ??
@@ -63,6 +68,15 @@ export function AccountPage({
     .map((part) => part[0]?.toUpperCase() ?? '')
     .join('')
   const activeOrders = orders.filter((order) => !['completed', 'cancelled'].includes(order.status ?? 'new')).length
+  const supportMessage = [
+    'Hello DMK Support, I need help with a complaint.',
+    `Name: ${session ? displayName : supportName.trim()}`,
+    session?.user.email ? `Email: ${session.user.email}` : '',
+    supportPhone.trim() ? `Phone: ${supportPhone.trim()}` : '',
+    supportOrderId.trim() ? `Order ID: ${supportOrderId.trim()}` : '',
+    `Complaint: ${supportComplaint.trim()}`,
+  ].filter(Boolean).join('\n')
+  const supportWhatsAppUrl = `https://wa.me/${supportWhatsAppNumber}?text=${encodeURIComponent(supportMessage)}`
 
   useEffect(() => {
     if (resendCooldown <= 0) return
@@ -309,6 +323,67 @@ export function AccountPage({
             </div>
           </section>
         )}
+        <section className="mx-auto mt-6 w-full max-w-[960px] rounded-2xl border border-[#eee5dd] bg-white p-5 shadow-[0_3px_12px_rgba(74,49,32,0.04)] min-[700px]:p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#e9550b]">Customer care</p>
+          <h2 className="mt-1 text-xl font-bold">Tell us how we can help</h2>
+          <p className="mt-1 text-sm leading-relaxed text-[#77706a]">
+            Share your complaint and we’ll open a WhatsApp chat with your details ready to send.
+          </p>
+          <div className="mt-4 grid gap-3 min-[700px]:grid-cols-2">
+            {!session && (
+              <label className="block text-sm font-medium">
+                Your name (optional)
+                <input
+                  autoComplete="name"
+                  value={supportName}
+                  onChange={(event) => setSupportName(event.target.value)}
+                  className="mt-1 h-11 w-full rounded-lg border border-[#eee5dd] px-3 text-base"
+                />
+              </label>
+            )}
+            <label className="block text-sm font-medium">
+              Phone number (optional)
+              <input
+                type="tel"
+                autoComplete="tel"
+                value={supportPhone}
+                onChange={(event) => setSupportPhone(event.target.value)}
+                className="mt-1 h-11 w-full rounded-lg border border-[#eee5dd] px-3 text-base"
+              />
+            </label>
+            <label className="block text-sm font-medium">
+              Order ID (optional)
+              <input
+                value={supportOrderId}
+                onChange={(event) => setSupportOrderId(event.target.value)}
+                className="mt-1 h-11 w-full rounded-lg border border-[#eee5dd] px-3 text-base"
+              />
+            </label>
+          </div>
+          <label className="mt-3 block text-sm font-medium">
+            Your complaint
+            <textarea
+              value={supportComplaint}
+              onChange={(event) => setSupportComplaint(event.target.value)}
+              className="mt-1 min-h-24 w-full rounded-lg border border-[#eee5dd] px-3 py-2 text-base"
+              placeholder="Tell us what happened and how we can help."
+            />
+          </label>
+          <a
+            href={supportComplaint.trim() ? supportWhatsAppUrl : undefined}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-disabled={!supportComplaint.trim()}
+            onClick={(event) => {
+              if (!supportComplaint.trim()) event.preventDefault()
+            }}
+            className={`mt-4 flex min-h-12 items-center justify-center rounded-full px-5 text-sm font-bold text-white ${
+              supportComplaint.trim() ? 'bg-[#168b50] hover:bg-[#117541]' : 'cursor-not-allowed bg-[#9ab7a8]'
+            }`}
+          >
+            Continue to WhatsApp
+          </a>
+        </section>
       </div>
       <BottomNav screen="track" onNavigate={onNavigate} cartCount={cartCount} />
     </div>

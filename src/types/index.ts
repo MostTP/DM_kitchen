@@ -38,6 +38,7 @@ export interface CustomerDetails {
   address: string
   fulfillmentMethod?: FulfillmentMethod
   deliveryDate: string
+  deliveryTime: string
   specialInstructions: string
 }
 

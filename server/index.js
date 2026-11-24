@@ -280,13 +280,45 @@ app.post('/api/payments/initialize', requireUser, async (request, response) => {
 
   const order = request.body
   const total = Number(order?.total)
+  const customerName = String(order?.customer?.fullName ?? '').trim()
+  const customerPhone = String(order?.customer?.phone ?? '').trim()
+  const fulfillmentMethod = order?.customer?.fulfillmentMethod
+  const customerAddress = String(order?.customer?.address ?? '').trim()
+  const deliveryDate = String(order?.customer?.deliveryDate ?? '')
+  const deliveryTime = String(order?.customer?.deliveryTime ?? '')
+  const dateParts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(deliveryDate)
+  const parsedDate = dateParts
+    ? new Date(Date.UTC(Number(dateParts[1]), Number(dateParts[2]) - 1, Number(dateParts[3])))
+    : null
+  const validDeliveryDate = Boolean(
+    dateParts &&
+    parsedDate &&
+    parsedDate.getUTCFullYear() === Number(dateParts[1]) &&
+    parsedDate.getUTCMonth() === Number(dateParts[2]) - 1 &&
+    parsedDate.getUTCDate() === Number(dateParts[3]),
+  )
+  const phoneDigits = customerPhone.replace(/\D/g, '')
   if (
     !request.user.email ||
+    !customerName ||
+    !customerPhone ||
     !Number.isFinite(total) ||
     total <= 0 ||
     !Number.isSafeInteger(Math.round(total * 100))
   ) {
-    return response.status(400).json({ error: 'A customer email and valid order total are required' })
+    return response.status(400).json({ error: 'Customer details and a valid order total are required' })
+  }
+  if (!/^\+?[\d\s()-]+$/.test(customerPhone) || phoneDigits.length < 7 || phoneDigits.length > 15) {
+    return response.status(400).json({ error: 'Enter a valid phone number' })
+  }
+  if (fulfillmentMethod !== 'delivery' && fulfillmentMethod !== 'collection') {
+    return response.status(400).json({ error: 'Select delivery or collection for your order' })
+  }
+  if (fulfillmentMethod === 'delivery' && !customerAddress) {
+    return response.status(400).json({ error: 'A delivery address is required' })
+  }
+  if (!validDeliveryDate || !/^([01]\d|2[0-3]):[0-5]\d$/.test(deliveryTime)) {
+    return response.status(400).json({ error: 'Select a valid preferred date and time' })
   }
 
   try {

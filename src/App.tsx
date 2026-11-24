@@ -73,6 +73,7 @@ function App() {
     email: "",
     address: "",
     deliveryDate: "",
+    deliveryTime: "",
     specialInstructions: "",
     fulfillmentMethod: undefined,
   });
@@ -194,8 +195,16 @@ function App() {
     if (!session) throw new PublicError("Sign in to your account before placing an order.");
     const orderCustomer = { ...customer, email: session.user.email ?? customer.email };
     if (!customer.fulfillmentMethod) throw new PublicError("Select delivery or collection before placing your order.");
+    if (!customer.fullName.trim()) throw new PublicError("Enter your full name before placing your order.");
+    const phoneDigits = customer.phone.replace(/\D/g, "");
+    if (!/^\+?[\d\s()-]+$/.test(customer.phone.trim()) || phoneDigits.length < 7 || phoneDigits.length > 15) {
+      throw new PublicError("Enter a valid phone number before placing your order.");
+    }
     if (customer.fulfillmentMethod === "delivery" && !customer.address.trim()) {
       throw new PublicError("Enter a delivery address before placing your order.");
+    }
+    if (!customer.deliveryDate || !customer.deliveryTime) {
+      throw new PublicError("Choose a preferred date and time before placing your order.");
     }
     const demoOrder = await createLocalDemoOrder(orderCustomer, cartItems, deliveryFee);
     const result = await initializeOrder(demoOrder, session.access_token);

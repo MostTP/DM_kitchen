@@ -421,13 +421,31 @@ export async function POST(
       const customerName = String(body?.customer?.fullName ?? "").trim();
       const customerPhone = String(body?.customer?.phone ?? "").trim();
       const customerAddress = String(body?.customer?.address ?? "").trim();
+      const deliveryDate = String(body?.customer?.deliveryDate ?? "");
+      const deliveryTime = String(body?.customer?.deliveryTime ?? "");
+      const dateParts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(deliveryDate);
+      const parsedDate = dateParts
+        ? new Date(Date.UTC(Number(dateParts[1]), Number(dateParts[2]) - 1, Number(dateParts[3])))
+        : null;
+      const validDeliveryDate = Boolean(
+        dateParts
+        && parsedDate
+        && parsedDate.getUTCFullYear() === Number(dateParts[1])
+        && parsedDate.getUTCMonth() === Number(dateParts[2]) - 1
+        && parsedDate.getUTCDate() === Number(dateParts[3]),
+      );
+      const phoneDigits = customerPhone.replace(/\D/g, "");
 
       if (!user.email || !customerName || !customerPhone)
         return json(request, 400, { error: "Customer name and phone number are required" });
+      if (!/^\+?[\d\s()-]+$/.test(customerPhone) || phoneDigits.length < 7 || phoneDigits.length > 15)
+        return json(request, 400, { error: "Enter a valid phone number" });
       if (method !== "delivery" && method !== "collection")
         return json(request, 400, { error: "Select delivery or collection for your order" });
       if (method === "delivery" && !customerAddress)
         return json(request, 400, { error: "A delivery address is required" });
+      if (!validDeliveryDate || !/^([01]\d|2[0-3]):[0-5]\d$/.test(deliveryTime))
+        return json(request, 400, { error: "Select a valid preferred date and time" });
 
       const items = Array.isArray(body?.items) ? body.items : [];
       const recalculatedSubtotal = items.reduce((sum: number, item: { quantity?: unknown; unitPrice?: unknown }) => {

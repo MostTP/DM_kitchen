@@ -307,7 +307,7 @@ app.post('/api/payments/initialize', requireUser, async (request, response) => {
     )
 
     if (!paystackResponse.ok || !paystack.status) {
-      return response.status(502).json({ error: paystack.message || 'Paystack initialization failed' })
+      return response.status(502).json({ error: 'Payment provider is temporarily unavailable' })
     }
 
     const storedOrder = {

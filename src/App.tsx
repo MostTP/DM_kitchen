@@ -23,6 +23,7 @@ import {
   verifyOrder,
 } from "./services/orders";
 import type { AccountOrder } from "./services/orders";
+import { PublicError, publicErrorMessage } from "./lib/errors";
 import type {
   CustomerDetails,
   DrinkId,
@@ -140,7 +141,7 @@ function App() {
             accessToken: session.access_token,
             refreshKey,
             orders: [],
-            error: error instanceof Error ? error.message : "Unable to load your orders.",
+            error: publicErrorMessage(error, "Unable to load your orders."),
           });
         }
       });
@@ -188,7 +189,7 @@ function App() {
   };
 
   const handlePay = async () => {
-    if (!session) throw new Error("Sign in to your account before placing an order.");
+    if (!session) throw new PublicError("Sign in to your account before placing an order.");
     const orderCustomer = { ...customer, email: session.user.email ?? customer.email };
     const demoOrder = await createLocalDemoOrder(orderCustomer, cartItems, DELIVERY_FEE);
     const result = await initializeOrder(demoOrder, session.access_token);

@@ -1,4 +1,5 @@
 import type { CartItem, CustomerDetails, Order, OrderStatus } from '../types'
+import { PublicError } from '../lib/errors'
 
 export type AccountOrder = Pick<
   Order,
@@ -7,7 +8,9 @@ export type AccountOrder = Pick<
 
 async function getError(response: Response, fallback: string) {
   const body = await response.json().catch(() => null)
-  return new Error(typeof body?.error === 'string' ? body.error : fallback)
+  if (response.status >= 500) return new PublicError(fallback)
+  const safeMessage = typeof body?.error === 'string' ? body.error : ''
+  return new PublicError(safeMessage || fallback)
 }
 
 async function fetchApi(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
@@ -16,7 +19,7 @@ async function fetchApi(input: RequestInfo | URL, init?: RequestInit): Promise<R
   } catch (error) {
     if (error instanceof TypeError) {
       const setupHint = 'Ensure the Next.js app is running and try again.'
-      throw new Error(
+      throw new PublicError(
         `Could not connect to the order service. ${setupHint}`,
         { cause: error },
       )
@@ -62,7 +65,7 @@ export async function getAdminOrders(accessToken: string): Promise<AccountOrder[
     headers: { Authorization: `Bearer ${accessToken}` },
   })
   if (response.status === 403) {
-    throw new Error('This account is not authorized for admin access.')
+    throw new PublicError('This account is not authorized for admin access.')
   }
   if (!response.ok) throw await getError(response, 'Unable to load admin orders')
   const result: { orders: AccountOrder[] } = await response.json()

@@ -11,6 +11,7 @@ import { BrandLogo } from '../BrandLogo'
 import { Header } from '../Header'
 import { ScreenLink } from '../ScreenLink'
 import { pageContentClass, screenClass } from '../../styles/classes'
+import { publicErrorMessage } from '../../lib/errors'
 
 const statuses: OrderStatus[] = ['new', 'preparing', 'ready', 'out_for_delivery', 'completed', 'cancelled']
 const money = (amount: number) => `₦${amount.toLocaleString()}`
@@ -62,7 +63,7 @@ export function AdminPage({
       .catch((requestError: unknown) => {
         if (active) {
           setLoadedFor(session.access_token)
-          setError(requestError instanceof Error ? requestError.message : 'Unable to load orders.')
+          setError(publicErrorMessage(requestError, 'Unable to load orders.'))
           setRefreshing(false)
         }
       })
@@ -103,7 +104,7 @@ export function AdminPage({
       setVerificationToken(result.verificationToken)
       setOrders((current) => current.map((order) => order.orderId === result.order.orderId ? result.order : order))
     } catch (requestError) {
-      setVerificationError(requestError instanceof Error ? requestError.message : 'Unable to verify this order.')
+      setVerificationError(publicErrorMessage(requestError, 'Unable to verify this order.'))
     } finally {
       setVerifying(false)
     }
@@ -124,7 +125,7 @@ export function AdminPage({
       if (verifiedOrder?.orderId === orderId) setVerifiedOrder(updated)
       if (status === 'out_for_delivery') setVerificationToken(null)
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Unable to update order.')
+      setError(publicErrorMessage(requestError, 'Unable to update order.'))
       if (status === 'out_for_delivery') setVerificationToken(null)
     } finally {
       setBusyOrder('')

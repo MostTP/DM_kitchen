@@ -5,6 +5,7 @@ import { Icon } from '../Icon'
 import { ScreenLink } from '../ScreenLink'
 import { primaryActionClass, screenClass } from '../../styles/classes'
 import { TermsContent } from './TermsPage'
+import { publicErrorMessage } from '../../lib/errors'
 
 interface PaymentPageProps {
   total: number
@@ -25,7 +26,7 @@ export function PaymentPage({ total, onNavigate, onPay }: PaymentPageProps) {
     try {
       await onPay()
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Unable to start payment.')
+      setError(publicErrorMessage(requestError, 'Unable to start payment.'))
     } finally {
       setLoading(false)
     }

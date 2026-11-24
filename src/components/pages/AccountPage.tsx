@@ -4,6 +4,7 @@ import { screenPaths } from '../../lib/routes'
 import type { Screen } from '../../types'
 import { supabase } from '../../lib/supabase'
 import type { AccountOrder } from '../../services/orders'
+import { authErrorMessage } from '../../lib/errors'
 import { BottomNav } from '../BottomNav'
 import { BrandLogo } from '../BrandLogo'
 import { Header } from '../Header'
@@ -31,7 +32,7 @@ const oauthCallbackError = (() => {
     fragment.get('error_description') ??
     query.get('error') ??
     fragment.get('error')
-  return description ? `Google sign-in failed: ${description}` : ''
+  return description ? 'Google sign-in could not be completed. Please try again.' : ''
 })()
 
 export function AccountPage({
@@ -71,7 +72,7 @@ export function AccountPage({
 
   const requestEmailCode = async () => {
     if (!supabase) {
-      setAuthError('Sign-in is not configured yet.')
+      setAuthError('Sign-in is temporarily unavailable. Please try again later.')
       return
     }
     if (!email.trim()) {
@@ -88,7 +89,7 @@ export function AccountPage({
     const { error } = await supabase.auth.signInWithOtp({ email: email.trim() })
     setAuthLoading(false)
     if (error) {
-      setAuthError(error.message)
+      setAuthError(authErrorMessage(error, 'Unable to send the sign-in code.'))
       return
     }
     setCodeSent(true)
@@ -106,12 +107,12 @@ export function AccountPage({
       type: 'email',
     })
     setAuthLoading(false)
-    if (error) setAuthError(error.message)
+    if (error) setAuthError(authErrorMessage(error, 'The sign-in code is invalid or has expired.'))
   }
 
   const signInWithGoogle = async () => {
     if (!supabase) {
-      setAuthError('Google sign-in is not configured in this deployment. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your hosting settings, then rebuild and redeploy.')
+      setAuthError('Sign-in is temporarily unavailable. Please try again later.')
       return
     }
     setAuthLoading(true)
@@ -125,11 +126,11 @@ export function AccountPage({
         options: { redirectTo: new URL(screenPaths.track, window.location.origin).toString() },
       })
       if (error) {
-        setAuthError(error.message)
+        setAuthError(authErrorMessage(error, 'Unable to start Google sign-in.'))
         setAuthLoading(false)
       }
-    } catch (requestError) {
-      setAuthError(requestError instanceof Error ? requestError.message : 'Unable to start Google sign-in.')
+    } catch {
+      setAuthError('Unable to start Google sign-in.')
       setAuthLoading(false)
     }
   }
@@ -137,7 +138,7 @@ export function AccountPage({
   const signOut = async () => {
     if (!supabase) return
     const { error } = await supabase.auth.signOut()
-    if (error) setAuthError(error.message)
+    if (error) setAuthError(authErrorMessage(error, 'Unable to sign out.'))
   }
 
   return (

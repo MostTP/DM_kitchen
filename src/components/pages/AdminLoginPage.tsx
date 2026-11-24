@@ -6,6 +6,7 @@ import { BrandLogo } from '../BrandLogo'
 import { Header } from '../Header'
 import { ScreenLink } from '../ScreenLink'
 import { primaryActionClass, screenClass } from '../../styles/classes'
+import { authErrorMessage, publicErrorMessage } from '../../lib/errors'
 
 export function AdminLoginPage({
   onNavigate,
@@ -20,7 +21,7 @@ export function AdminLoginPage({
   const signIn = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!supabase) {
-      setError('Sign-in is not configured.')
+      setError('Sign-in is temporarily unavailable. Please try again later.')
       return
     }
 
@@ -36,7 +37,7 @@ export function AdminLoginPage({
     if (signInError || !data.session) {
       sessionStorage.removeItem('dmk-after-sign-in')
       setLoading(false)
-      setError(signInError?.message ?? 'Unable to sign in.')
+      setError(authErrorMessage(signInError, 'Unable to sign in.'))
       return
     }
 
@@ -47,7 +48,7 @@ export function AdminLoginPage({
     } catch (requestError) {
       sessionStorage.removeItem('dmk-after-sign-in')
       await supabase.auth.signOut()
-      setError(requestError instanceof Error ? requestError.message : 'Unable to verify admin access.')
+      setError(publicErrorMessage(requestError, 'Unable to verify admin access.'))
     } finally {
       setLoading(false)
     }

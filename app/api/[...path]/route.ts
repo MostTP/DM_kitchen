@@ -434,7 +434,7 @@ export async function POST(
       });
       if (!response.ok || !result.status)
         return json(request, 502, {
-          error: result.message || "Paystack initialization failed",
+          error: "Payment provider is temporarily unavailable",
         });
       const stored = {
         ...body,

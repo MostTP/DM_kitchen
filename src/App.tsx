@@ -35,7 +35,7 @@ import type {
   CartItem,
 } from "./types";
 
-const DELIVERY_FEE = 1000;
+const DELIVERY_FEE = 1500;
 
 function App() {
   const [screen, setScreen] = useState<Screen>(() =>

@@ -14,7 +14,7 @@ const supabase =
       )
     : null;
 
-const DELIVERY_FEE = 1000;
+const DELIVERY_FEE = 1500;
 
 const orderStatuses = new Set([
   "new",

@@ -52,6 +52,7 @@ export function AccountPage({
   const [authError, setAuthError] = useState(oauthCallbackError)
   const [authLoading, setAuthLoading] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
+  const [supportOpen, setSupportOpen] = useState(false)
   const [supportName, setSupportName] = useState('')
   const [supportPhone, setSupportPhone] = useState('')
   const [supportOrderId, setSupportOrderId] = useState('')
@@ -325,66 +326,104 @@ export function AccountPage({
         )}
         <section className="mx-auto mt-6 w-full max-w-[960px] rounded-2xl border border-[#eee5dd] bg-white p-5 shadow-[0_3px_12px_rgba(74,49,32,0.04)] min-[700px]:p-6">
           <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#e9550b]">Customer care</p>
-          <h2 className="mt-1 text-xl font-bold">Tell us how we can help</h2>
+          <h2 className="mt-1 text-xl font-bold">Need help with an order?</h2>
           <p className="mt-1 text-sm leading-relaxed text-[#77706a]">
-            Share your complaint and we’ll open a WhatsApp chat with your details ready to send.
+            Contact our team on WhatsApp and we’ll be happy to help.
           </p>
-          <div className="mt-4 grid gap-3 min-[700px]:grid-cols-2">
-            {!session && (
+          <button
+            type="button"
+            onClick={() => setSupportOpen(true)}
+            className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-[#168b50] px-5 text-sm font-bold text-white hover:bg-[#117541]"
+          >
+            Contact customer care
+          </button>
+        </section>
+      </div>
+      {supportOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/55 sm:items-center sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="support-modal-title"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setSupportOpen(false)
+          }}
+        >
+          <section className="flex max-h-[92svh] w-full flex-col overflow-y-auto rounded-t-2xl bg-[#fffaf6] p-5 shadow-2xl sm:max-w-[560px] sm:rounded-2xl sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#e9550b]">Customer care</p>
+                <h2 id="support-modal-title" className="mt-1 text-xl font-bold">Tell us how we can help</h2>
+                <p className="mt-1 text-sm leading-relaxed text-[#77706a]">
+                  Share your complaint and we’ll open a WhatsApp chat with your details ready to send.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSupportOpen(false)}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#eee5dd] text-xl"
+                aria-label="Close customer care"
+              >
+                ×
+              </button>
+            </div>
+            <div className="mt-4 grid gap-3 min-[700px]:grid-cols-2">
+              {!session && (
+                <label className="block text-sm font-medium">
+                  Your name (optional)
+                  <input
+                    autoComplete="name"
+                    value={supportName}
+                    onChange={(event) => setSupportName(event.target.value)}
+                    className="mt-1 h-11 w-full rounded-lg border border-[#eee5dd] px-3 text-base"
+                  />
+                </label>
+              )}
               <label className="block text-sm font-medium">
-                Your name (optional)
+                Phone number (optional)
                 <input
-                  autoComplete="name"
-                  value={supportName}
-                  onChange={(event) => setSupportName(event.target.value)}
+                  type="tel"
+                  autoComplete="tel"
+                  value={supportPhone}
+                  onChange={(event) => setSupportPhone(event.target.value)}
                   className="mt-1 h-11 w-full rounded-lg border border-[#eee5dd] px-3 text-base"
                 />
               </label>
-            )}
-            <label className="block text-sm font-medium">
-              Phone number (optional)
-              <input
-                type="tel"
-                autoComplete="tel"
-                value={supportPhone}
-                onChange={(event) => setSupportPhone(event.target.value)}
-                className="mt-1 h-11 w-full rounded-lg border border-[#eee5dd] px-3 text-base"
+              <label className="block text-sm font-medium">
+                Order ID (optional)
+                <input
+                  value={supportOrderId}
+                  onChange={(event) => setSupportOrderId(event.target.value)}
+                  className="mt-1 h-11 w-full rounded-lg border border-[#eee5dd] px-3 text-base"
+                />
+              </label>
+            </div>
+            <label className="mt-3 block text-sm font-medium">
+              Your complaint
+              <textarea
+                value={supportComplaint}
+                onChange={(event) => setSupportComplaint(event.target.value)}
+                className="mt-1 min-h-24 w-full rounded-lg border border-[#eee5dd] px-3 py-2 text-base"
+                placeholder="Tell us what happened and how we can help."
               />
             </label>
-            <label className="block text-sm font-medium">
-              Order ID (optional)
-              <input
-                value={supportOrderId}
-                onChange={(event) => setSupportOrderId(event.target.value)}
-                className="mt-1 h-11 w-full rounded-lg border border-[#eee5dd] px-3 text-base"
-              />
-            </label>
-          </div>
-          <label className="mt-3 block text-sm font-medium">
-            Your complaint
-            <textarea
-              value={supportComplaint}
-              onChange={(event) => setSupportComplaint(event.target.value)}
-              className="mt-1 min-h-24 w-full rounded-lg border border-[#eee5dd] px-3 py-2 text-base"
-              placeholder="Tell us what happened and how we can help."
-            />
-          </label>
-          <a
-            href={supportComplaint.trim() ? supportWhatsAppUrl : undefined}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-disabled={!supportComplaint.trim()}
-            onClick={(event) => {
-              if (!supportComplaint.trim()) event.preventDefault()
-            }}
-            className={`mt-4 flex min-h-12 items-center justify-center rounded-full px-5 text-sm font-bold text-white ${
-              supportComplaint.trim() ? 'bg-[#168b50] hover:bg-[#117541]' : 'cursor-not-allowed bg-[#9ab7a8]'
-            }`}
-          >
-            Continue to WhatsApp
-          </a>
-        </section>
-      </div>
+            <a
+              href={supportComplaint.trim() ? supportWhatsAppUrl : undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-disabled={!supportComplaint.trim()}
+              onClick={(event) => {
+                if (!supportComplaint.trim()) event.preventDefault()
+              }}
+              className={`mt-4 flex min-h-12 items-center justify-center rounded-full px-5 text-sm font-bold text-white ${
+                supportComplaint.trim() ? 'bg-[#168b50] hover:bg-[#117541]' : 'cursor-not-allowed bg-[#9ab7a8]'
+              }`}
+            >
+              Continue to WhatsApp
+            </a>
+          </section>
+        </div>
+      )}
       <BottomNav screen="track" onNavigate={onNavigate} cartCount={cartCount} />
     </div>
   )

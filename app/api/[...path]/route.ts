@@ -48,6 +48,7 @@ interface StoredOrder {
   delivery_fee: number;
   total: number;
   payment_status: string;
+  paystack_reference?: string | null;
   status?: string;
   created_at?: string;
 }
@@ -536,22 +537,44 @@ export async function POST(
         error: "Enter the order code provided by the customer",
       });
     try {
+      if (!(await ordersTableReady()))
+        return json(request, 503, {
+          error: "Supabase orders table is not ready",
+        });
       const { data, error } = await supabase!
         .from("orders")
         .select(
-          "order_id, customer, items, subtotal, delivery_fee, total, status, payment_status, created_at",
+          "order_id, customer, items, subtotal, delivery_fee, total, status, payment_status, created_at, paystack_reference",
         )
         .eq("order_id", orderId)
         .maybeSingle();
       if (error) throw error;
       if (!data)
         return json(request, 404, { error: "No order matches that code" });
-      const canDeliver = data.payment_status === "paid";
+      let order: StoredOrder = data;
+      if (
+        order.payment_status !== "paid" &&
+        order.paystack_reference &&
+        process.env.PAYSTACK_SECRET_KEY
+      ) {
+        const { response: paymentResponse, result: payment } = await paystack(
+          `/transaction/verify/${encodeURIComponent(order.paystack_reference)}`,
+        );
+        if (!paymentResponse.ok || !payment.status)
+          return json(request, 502, {
+            error: "Unable to verify payment with Paystack",
+          });
+        if (payment.data?.status === "success") {
+          await markOrderPaid(order.paystack_reference, payment.data);
+          order = { ...order, payment_status: "paid" };
+        }
+      }
+      const canDeliver = order.payment_status === "paid";
       return json(request, 200, {
-        order: mapOrder(data),
+        order: mapOrder(order),
         canDeliver,
         verificationToken: canDeliver
-          ? createDeliveryToken(data.order_id, user.id)
+          ? createDeliveryToken(order.order_id, user.id)
           : null,
       });
     } catch (error) {

@@ -40,12 +40,14 @@ export function AdminPage({
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus>('all')
+  const [overviewFilter, setOverviewFilter] = useState<'all' | 'today' | 'attention' | 'active' | 'paid'>('all')
   const [orderCode, setOrderCode] = useState('')
   const [verifiedOrder, setVerifiedOrder] = useState<AccountOrder | null>(null)
   const [verificationToken, setVerificationToken] = useState<string | null>(null)
   const [verifying, setVerifying] = useState(false)
   const [verificationError, setVerificationError] = useState('')
   const isLoading = Boolean(session && loadedFor !== session.access_token)
+  const currentDate = today()
 
   useEffect(() => {
     let active = true
@@ -74,22 +76,34 @@ export function AdminPage({
     const term = search.trim().toLowerCase()
     return orders.filter((order) => {
       const matchesStatus = statusFilter === 'all' || (order.status ?? 'new') === statusFilter
+      const matchesOverview = overviewFilter === 'all' ||
+        (overviewFilter === 'today' && order.createdAt && new Date(order.createdAt).toLocaleDateString() === currentDate) ||
+        (overviewFilter === 'attention' && order.status === 'new' && order.paymentStatus === 'paid') ||
+        (overviewFilter === 'active' && order.paymentStatus === 'paid' && !['completed', 'cancelled'].includes(order.status ?? 'new')) ||
+        (overviewFilter === 'paid' && order.paymentStatus === 'paid')
       const matchesSearch = !term || [
         order.orderId,
         order.customer.fullName,
         order.customer.phone,
         order.customer.email,
       ].some((value) => value?.toLowerCase().includes(term))
-      return matchesStatus && matchesSearch
+      return matchesStatus && matchesOverview && matchesSearch
     })
-  }, [orders, search, statusFilter])
+  }, [orders, search, statusFilter, overviewFilter, currentDate])
 
-  const todayOrders = orders.filter((order) => order.createdAt && new Date(order.createdAt).toLocaleDateString() === today()).length
-  const activeOrders = orders.filter((order) => !['completed', 'cancelled'].includes(order.status ?? 'new')).length
+  const todayOrders = orders.filter((order) => order.createdAt && new Date(order.createdAt).toLocaleDateString() === currentDate).length
+  const activeOrders = orders.filter((order) => order.paymentStatus === 'paid' && !['completed', 'cancelled'].includes(order.status ?? 'new')).length
   const paidRevenue = orders
     .filter((order) => order.paymentStatus === 'paid')
     .reduce((total, order) => total + order.total, 0)
   const needsAttention = orders.filter((order) => order.status === 'new' && order.paymentStatus === 'paid').length
+
+  const openOverview = (filter: typeof overviewFilter) => {
+    setOverviewFilter((current) => current === filter ? 'all' : filter)
+    setSearch('')
+    setStatusFilter('all')
+    document.getElementById('admin-orders')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   const verifyCode = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -182,10 +196,10 @@ export function AdminPage({
             )}
 
             <section aria-label="Order overview" className="mt-5 grid grid-cols-2 gap-3 min-[900px]:grid-cols-4">
-              <MetricCard label="Orders today" value={todayOrders} icon="◷" detail="Received today" />
-              <MetricCard label="Needs attention" value={needsAttention} icon="✳" detail="Paid · not started" accent />
-              <MetricCard label="Active orders" value={activeOrders} icon="↗" detail="Being fulfilled" />
-              <MetricCard label="Paid revenue" value={money(paidRevenue)} icon="₦" detail="Recent 200 orders" />
+              <MetricCard label="Orders today" value={todayOrders} icon="◷" detail="Received today" onClick={() => openOverview('today')} active={overviewFilter === 'today'} />
+              <MetricCard label="Needs attention" value={needsAttention} icon="✳" detail="Paid · not started" accent onClick={() => openOverview('attention')} active={overviewFilter === 'attention'} />
+              <MetricCard label="Active orders" value={activeOrders} icon="↗" detail="Paid · being fulfilled" onClick={() => openOverview('active')} active={overviewFilter === 'active'} />
+              <MetricCard label="Paid revenue" value={money(paidRevenue)} icon="₦" detail="Recent 200 orders" onClick={() => openOverview('paid')} active={overviewFilter === 'paid'} />
             </section>
 
             <section className="mt-5 rounded-2xl border border-[#f1dfd0] bg-gradient-to-br from-[#fff8f1] to-white p-4 shadow-[0_5px_18px_rgba(74,49,32,0.04)] min-[700px]:p-5">
@@ -246,7 +260,7 @@ export function AdminPage({
               )}
             </section>
 
-            <section className="mt-7">
+            <section id="admin-orders" className="mt-7 scroll-mt-4">
               <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.13em] text-[#e9550b]">Kitchen queue</p>
@@ -364,21 +378,30 @@ function MetricCard({
   icon,
   detail,
   accent = false,
+  active = false,
+  onClick,
 }: {
   label: string
   value: string | number
   icon: string
   detail: string
   accent?: boolean
+  active?: boolean
+  onClick: () => void
 }) {
   return (
-    <article className={`rounded-2xl border p-4 shadow-[0_4px_16px_rgba(74,49,32,0.04)] min-[700px]:p-5 ${accent ? 'border-[#f4d0b9] bg-[#fff8f1]' : 'border-[#ece3dc] bg-white'}`}>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`rounded-2xl border p-4 text-left shadow-[0_4px_16px_rgba(74,49,32,0.04)] transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e9550b] min-[700px]:p-5 ${active ? 'border-[#e9550b] ring-2 ring-[#ff791c]/20' : accent ? 'border-[#f4d0b9] bg-[#fff8f1]' : 'border-[#ece3dc] bg-white'}`}
+    >
       <div className="flex items-start justify-between gap-2">
         <p className="text-xs font-semibold text-[#77706a] min-[700px]:text-sm">{label}</p>
         <span className={`grid h-8 w-8 place-items-center rounded-lg text-sm font-bold ${accent ? 'bg-[#ffeadb] text-[#e9550b]' : 'bg-[#f5f0ec] text-[#66574d]'}`} aria-hidden="true">{icon}</span>
       </div>
       <strong className="mt-3 block truncate text-xl font-extrabold tracking-tight min-[700px]:text-2xl">{value}</strong>
       <span className="mt-1 block text-[11px] text-[#8b7c72]">{detail}</span>
-    </article>
+    </button>
   )
 }

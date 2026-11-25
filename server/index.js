@@ -447,20 +447,37 @@ app.post('/api/admin/orders/verify', requireUser, requireAdmin, async (request, 
   }
 
   try {
+    if (!(await ordersTableReady())) {
+      return response.status(503).json({ error: 'Supabase orders table is not ready' })
+    }
     const { data, error } = await supabase
       .from('orders')
-      .select('order_id, customer, items, subtotal, delivery_fee, total, status, payment_status, created_at')
+      .select('order_id, customer, items, subtotal, delivery_fee, total, status, payment_status, created_at, paystack_reference')
       .eq('order_id', orderId)
       .maybeSingle()
     if (error) throw error
     if (!data) return response.status(404).json({ error: 'No order matches that code' })
 
-    const canDeliver = data.payment_status === 'paid'
+    let order = data
+    if (order.payment_status !== 'paid' && order.paystack_reference && process.env.PAYSTACK_SECRET_KEY) {
+      const { response: paystackResponse, result: paystack } = await getPaystackResponse(
+        `/transaction/verify/${encodeURIComponent(order.paystack_reference)}`,
+      )
+      if (!paystackResponse.ok || !paystack.status) {
+        return response.status(502).json({ error: 'Unable to verify payment with Paystack' })
+      }
+      if (paystack.data?.status === 'success') {
+        await markOrderPaid(order.paystack_reference, paystack.data)
+        order = { ...order, payment_status: 'paid' }
+      }
+    }
+
+    const canDeliver = order.payment_status === 'paid'
     return response.json({
-      order: mapOrder(data),
+      order: mapOrder(order),
       canDeliver,
       verificationToken: canDeliver
-        ? createDeliveryVerificationToken(data.order_id, request.user.id)
+        ? createDeliveryVerificationToken(order.order_id, request.user.id)
         : null,
     })
   } catch (error) {

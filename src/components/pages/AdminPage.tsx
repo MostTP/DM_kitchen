@@ -14,6 +14,7 @@ import { pageContentClass, screenClass } from '../../styles/classes'
 import { publicErrorMessage } from '../../lib/errors'
 
 const statuses: OrderStatus[] = ['new', 'preparing', 'ready', 'out_for_delivery', 'completed', 'cancelled']
+const ordersPerPage = 10
 const money = (amount: number) => `₦${amount.toLocaleString()}`
 const prettyStatus = (status: string) => status.replaceAll('_', ' ')
 const today = () => new Date().toLocaleDateString()
@@ -41,6 +42,7 @@ export function AdminPage({
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus>('all')
   const [overviewFilter, setOverviewFilter] = useState<'all' | 'today' | 'attention' | 'active' | 'paid'>('all')
+  const [currentPage, setCurrentPage] = useState(1)
   const [orderCode, setOrderCode] = useState('')
   const [verifiedOrder, setVerifiedOrder] = useState<AccountOrder | null>(null)
   const [verificationToken, setVerificationToken] = useState<string | null>(null)
@@ -91,6 +93,15 @@ export function AdminPage({
     })
   }, [orders, search, statusFilter, overviewFilter, currentDate])
 
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / ordersPerPage))
+  const visiblePage = Math.min(currentPage, totalPages)
+  const visibleOrders = filteredOrders.slice(
+    (visiblePage - 1) * ordersPerPage,
+    visiblePage * ordersPerPage,
+  )
+  const firstVisibleOrder = filteredOrders.length ? (visiblePage - 1) * ordersPerPage + 1 : 0
+  const lastVisibleOrder = Math.min(visiblePage * ordersPerPage, filteredOrders.length)
+
   const todayOrders = orders.filter((order) => order.createdAt && new Date(order.createdAt).toLocaleDateString() === currentDate).length
   const activeOrders = orders.filter((order) => order.paymentStatus === 'paid' && !['completed', 'cancelled'].includes(order.status ?? 'new')).length
   const paidRevenue = orders
@@ -100,6 +111,7 @@ export function AdminPage({
 
   const openOverview = (filter: typeof overviewFilter) => {
     setOverviewFilter((current) => current === filter ? 'all' : filter)
+    setCurrentPage(1)
     setSearch('')
     setStatusFilter('all')
     document.getElementById('admin-orders')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -196,7 +208,7 @@ export function AdminPage({
             )}
 
             <section aria-label="Order overview" className="mt-5 grid grid-cols-2 gap-3 min-[900px]:grid-cols-4">
-              <MetricCard label="Orders today" value={todayOrders} icon="◷" detail="Received today" onClick={() => openOverview('today')} active={overviewFilter === 'today'} />
+              <MetricCard label="Paid orders today" value={todayOrders} icon="◷" detail="Paid · received today" onClick={() => openOverview('today')} active={overviewFilter === 'today'} />
               <MetricCard label="Needs attention" value={needsAttention} icon="✳" detail="Paid · not started" accent onClick={() => openOverview('attention')} active={overviewFilter === 'attention'} />
               <MetricCard label="Active orders" value={activeOrders} icon="↗" detail="Paid · being fulfilled" onClick={() => openOverview('active')} active={overviewFilter === 'active'} />
               <MetricCard label="Paid revenue" value={money(paidRevenue)} icon="₦" detail="Recent 200 orders" onClick={() => openOverview('paid')} active={overviewFilter === 'paid'} />
@@ -264,19 +276,19 @@ export function AdminPage({
               <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.13em] text-[#e9550b]">Kitchen queue</p>
-                  <h2 className="mt-1 text-xl font-bold">Recent orders <span className="text-sm font-medium text-[#8b7c72]">({orders.length})</span></h2>
+                  <h2 className="mt-1 text-xl font-bold">Recent paid orders <span className="text-sm font-medium text-[#8b7c72]">({orders.length})</span></h2>
                 </div>
-                <span className="text-xs text-[#8b7c72]">Showing up to 200 most recent</span>
+                <span className="text-xs text-[#8b7c72]">Showing up to 200 most recent paid orders</span>
               </div>
               <div className="mb-4 grid gap-2 min-[700px]:grid-cols-[minmax(240px,1fr)_220px]">
                 <label className="relative block">
                   <span className="sr-only">Search orders</span>
                   <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#8b7c72]" aria-hidden="true">⌕</span>
-                  <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search ID, customer, phone or email" className="h-11 w-full rounded-xl border border-[#e9e0d9] bg-white pl-10 pr-3 text-sm outline-none focus:border-[#f07830] focus:ring-4 focus:ring-[#ff791c]/10" />
+                  <input value={search} onChange={(event) => { setSearch(event.target.value); setCurrentPage(1) }} placeholder="Search ID, customer, phone or email" className="h-11 w-full rounded-xl border border-[#e9e0d9] bg-white pl-10 pr-3 text-sm outline-none focus:border-[#f07830] focus:ring-4 focus:ring-[#ff791c]/10" />
                 </label>
                 <label>
                   <span className="sr-only">Filter by status</span>
-                  <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as 'all' | OrderStatus)} className="h-11 w-full rounded-xl border border-[#e9e0d9] bg-white px-3 text-sm capitalize outline-none focus:border-[#f07830]">
+                  <select value={statusFilter} onChange={(event) => { setStatusFilter(event.target.value as 'all' | OrderStatus); setCurrentPage(1) }} className="h-11 w-full rounded-xl border border-[#e9e0d9] bg-white px-3 text-sm capitalize outline-none focus:border-[#f07830]">
                     <option value="all">All order statuses</option>
                     {statuses.map((status) => <option key={status} value={status}>{prettyStatus(status)}</option>)}
                   </select>
@@ -286,8 +298,9 @@ export function AdminPage({
               {isLoading ? (
                 <div role="status" className="rounded-2xl border border-[#eee5dd] bg-white p-6 text-sm text-[#77706a]">Loading recent orders…</div>
               ) : filteredOrders.length ? (
-                <div className="grid gap-3 min-[1000px]:grid-cols-2">
-                  {filteredOrders.map((order) => {
+                <>
+                  <div className="grid gap-3 min-[1000px]:grid-cols-2">
+                  {visibleOrders.map((order) => {
                     const isVerified = verifiedOrder?.orderId === order.orderId && Boolean(verificationToken)
                     return (
                       <article key={order.orderId} className="overflow-hidden rounded-2xl border border-[#ece3dc] bg-white shadow-[0_4px_16px_rgba(74,49,32,0.045)]">
@@ -356,12 +369,41 @@ export function AdminPage({
                       </article>
                     )
                   })}
-                </div>
+                  </div>
+                  {filteredOrders.length > ordersPerPage && (
+                    <nav aria-label="Recent paid orders pagination" className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                      <p className="text-sm text-[#77706a]">
+                        Showing {firstVisibleOrder}–{lastVisibleOrder} of {filteredOrders.length}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setCurrentPage(visiblePage - 1)}
+                          disabled={visiblePage === 1}
+                          className="min-h-10 rounded-lg border border-[#e7e1dc] bg-white px-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          Previous
+                        </button>
+                        <span aria-current="page" className="px-2 text-sm font-semibold text-[#514740]">
+                          Page {visiblePage} of {totalPages}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setCurrentPage(visiblePage + 1)}
+                          disabled={visiblePage === totalPages}
+                          className="min-h-10 rounded-lg border border-[#e7e1dc] bg-white px-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </nav>
+                  )}
+                </>
               ) : (
                 <div className="rounded-2xl border border-dashed border-[#dfd3ca] bg-white px-5 py-10 text-center">
                   <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#fff0e7] text-xl text-[#e9550b]" aria-hidden="true">▤</span>
-                  <h3 className="mt-3 font-bold">{orders.length ? 'No matching orders' : 'No orders to show yet'}</h3>
-                  <p className="mt-1 text-sm text-[#77706a]">{orders.length ? 'Try another search or status filter.' : 'New customer orders will appear here.'}</p>
+                  <h3 className="mt-3 font-bold">{orders.length ? 'No matching paid orders' : 'No paid orders to show yet'}</h3>
+                  <p className="mt-1 text-sm text-[#77706a]">{orders.length ? 'Try another search or status filter.' : 'Orders will appear here after payment is confirmed.'}</p>
                 </div>
               )}
             </section>

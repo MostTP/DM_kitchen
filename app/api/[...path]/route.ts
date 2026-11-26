@@ -352,6 +352,7 @@ export async function GET(
         .select(
           "order_id, customer, items, subtotal, delivery_fee, total, status, payment_status, created_at",
         )
+        .eq("payment_status", "paid")
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;

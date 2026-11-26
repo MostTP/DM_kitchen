@@ -133,6 +133,14 @@ function mapOrder(data: StoredOrder) {
   };
 }
 
+function normalizeOrderId(value: string) {
+  const trimmed = value.trim();
+  const generatedId = /^DMK-(\d+)-([a-f\d]{6})$/i.exec(trimmed);
+  return generatedId
+    ? `DMK-${generatedId[1]}-${generatedId[2].toLowerCase()}`
+    : trimmed;
+}
+
 function orderResponse(data: StoredOrder) {
   return {
     orderId: data.order_id,
@@ -530,7 +538,7 @@ export async function POST(
     if (!isAdmin(user)) return json(request, 403, { error: "Forbidden" });
     const orderId =
       typeof body?.orderId === "string"
-        ? body.orderId.trim().toUpperCase()
+        ? normalizeOrderId(body.orderId)
         : "";
     if (!orderId || orderId.length > 100)
       return json(request, 400, {
@@ -599,7 +607,7 @@ export async function PATCH(
 
   const match = route.match(/^admin\/orders\/([^/]+)\/status$/);
   if (!match) return json(request, 404, { error: "Not found" });
-  const orderId = decodeURIComponent(match[1]).trim().toUpperCase();
+  const orderId = normalizeOrderId(decodeURIComponent(match[1]));
   const body = await request.json().catch(() => null);
   const status = body?.status;
   if (!orderStatuses.has(status))

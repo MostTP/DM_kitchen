@@ -18,9 +18,8 @@ async function fetchApi(input: RequestInfo | URL, init?: RequestInit): Promise<R
     return await fetch(input, init)
   } catch (error) {
     if (error instanceof TypeError) {
-      const setupHint = 'Ensure the Next.js app is running and try again.'
       throw new PublicError(
-        `Could not connect to the order service. ${setupHint}`,
+        "We couldn't connect just now. Please try again in a moment.",
         { cause: error },
       )
     }

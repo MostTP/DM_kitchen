@@ -144,6 +144,14 @@ function mapOrder(data) {
   }
 }
 
+function normalizeOrderId(value) {
+  const trimmed = value.trim()
+  const generatedId = /^DMK-(\d+)-([a-f\d]{6})$/i.exec(trimmed)
+  return generatedId
+    ? `DMK-${generatedId[1]}-${generatedId[2].toLowerCase()}`
+    : trimmed
+}
+
 async function ordersTableReady() {
   if (!supabase) return false
   const { error } = await supabase.from('orders').select('order_id').limit(1)
@@ -440,7 +448,7 @@ const orderStatuses = new Set([
 
 app.post('/api/admin/orders/verify', requireUser, requireAdmin, async (request, response) => {
   const orderId = typeof request.body?.orderId === 'string'
-    ? request.body.orderId.trim().toUpperCase()
+    ? normalizeOrderId(request.body.orderId)
     : ''
   if (!orderId || orderId.length > 100) {
     return response.status(400).json({ error: 'Enter the order code provided by the customer' })
@@ -511,7 +519,7 @@ app.patch('/api/admin/orders/:orderId/status', requireUser, requireAdmin, async 
   }
 
   try {
-    const orderId = request.params.orderId.trim().toUpperCase()
+    const orderId = normalizeOrderId(request.params.orderId)
     if (status === 'out_for_delivery' && !isValidDeliveryVerificationToken(
       request.body?.verificationToken,
       orderId,
